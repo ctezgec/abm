@@ -19,7 +19,29 @@ class Households(Agent):
     def __init__(self, unique_id, model):
         super().__init__(unique_id, model)
         self.is_adapted = False  # Initial adaptation status set to False
+        self.flood_probability = 0.3  # Probability of flooding
+    
+        # Adaptation status for each type of measure
+        self.is_elevated = False  # Initial elevation status set to False
+        self.is_dryproofed = False  # Initial dry-proofing status set to False
+        self.is_wetproofed = False  # Initial wet-proofing status set to False
 
+        # Demographic attributes
+        self.age = random.randint(20, 75)  # Age of the household
+        self.income = random.randint(1000, 10000)  # Monthly income of the household
+        self.initial_saving = random.randint(1,5) # how many income the household has saved
+        self.savings = self.initial_saving*self.income  # Total savings of the household
+        self.saving_rate = 0.1  # Monthly saving rate of the household
+        self.monthly_saved = self.income * self.saving_rate  # Monthly savings of the household
+
+        # Measure costs and efficiencies
+        self.elevation_cost =  random.randint(30000, 40000)  # Cost of elevation
+        self.elevation_efficiency = 1  # Efficiency of elevation
+        self.dryproofing_cost = random.randint(5500, 6500)  # Cost of dry-proofing
+        self.dryproofing_efficiency = 0.5  # Efficiency of dry-proofing
+        self.wetproofing_cost = random.randint(6500, 8000)  # Cost of wet-proofing
+        self.wetproofing_efficiency = 0.4  # Efficiency of wet-proofing
+    
         # getting flood map values
         # Get a random location on the map
         loc_x, loc_y = generate_random_location_within_map_domain()
