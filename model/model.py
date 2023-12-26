@@ -32,7 +32,7 @@ class AdaptationModel(Model):
                  # ### network related parameters ###
                  # The social network structure that is used.
                  # Can currently be "erdos_renyi", "barabasi_albert", "watts_strogatz", or "no_network"
-                 network = 'watts_strogatz',
+                 network = 'no_network',
                  # likeliness of edge being created between two nodes
                  probability_of_network_connection = 0.4,
                  # number of edges for BA network
@@ -70,9 +70,10 @@ class AdaptationModel(Model):
             self.schedule.add(household)
             self.grid.place_agent(agent=household, node_id=node)
 
-        # You might want to create other agents here, e.g. insurance agents.
+        # TO-DO CREATE GOVERNMENT AGENT HERE
 
         # Data collection setup to collect data
+        # TO-DO ADD MORE REPORTERS
         model_metrics = {
                         "total_adapted_households": self.total_adapted_households,
                         # ... other reporters ...
@@ -182,6 +183,7 @@ class AdaptationModel(Model):
         assume local flooding instead of global flooding). The actual flood depth can be 
         estimated differently
         """
+        # TO DO LOCAL FLOODING OR OTHER GLOBAL FLOODINGS
         if self.schedule.steps == 5:
             for agent in self.schedule.agents:
                 # Calculate the actual flood depth as a random number between 0.5 and 1.2 times the estimated flood depth
