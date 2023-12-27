@@ -163,12 +163,3 @@ def calculate_basic_flood_damage(flood_depth):
         flood_damage = 0.1746 * math.log(flood_depth) + 0.6483
     return flood_damage
 
-def generate_government_location_within_map_domain()
-
-def government_scope()
-
-def bottom_20_income()
-
-def top_20_risk()
-
-def efficiency_calculation()

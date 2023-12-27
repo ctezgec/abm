@@ -95,18 +95,27 @@ class Government(Agent):
         self.location = Point(loc_x, loc_y)
 
         # use dictionary to get all the households belong to this government
-        self.citizen = government_scope()
+        self.citizen = self.government_scope()
 
         # eaxh tick their income and saving change, so eligibility changes
-        self.subsidy_eligibility_income = bottom_20_income()
-        self.subsidy_eligibility_risklevel = top_20_risk()
+        self.subsidy_eligibility_income = self.bottom_20_income()
+        self.subsidy_eligibility_risklevel = self.top_20_risk()
 
         self.subsidy_percentage_elevation = random.randint(80.100)
         self.subsidy_percentage_dryproof = random.randint(20,30)
         self.subsidy_percentage_wetproof = random.randint(50,60)
 
         # calculate estimated reduced damage / total estimated damage as an indicator to inform whether should adjust eligibility and percentage of subsidy
-        self.subsidy_efficiency = efficiency_calculation()
+        self.subsidy_efficiency = self.efficiency_calculation()
+        
+    def government_scope():
+        pass
+    def bottom_20_income():
+        pass
+    def top_20_risk():
+        pass
+    def efficiency_calculation():
+        pass
 
     def step(self):
         #here two options: 1. set a fixed threshold. 2. compare to the average
