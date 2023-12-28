@@ -163,3 +163,16 @@ def calculate_basic_flood_damage(flood_depth):
         flood_damage = 0.1746 * math.log(flood_depth) + 0.6483
     return flood_damage
 
+
+def calculate_EU(flood_probability, flood_damage, measure_information):
+    """
+    Calculates Expected Utility (EU) of households' flooding adaptation measures.
+        Parameters:
+            bla (float): explanation
+            bla (float): explanation
+            bla (dict): explanation
+        Return:
+            bla (str): explanation
+
+    """
+    pass
