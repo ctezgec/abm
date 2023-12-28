@@ -216,3 +216,4 @@ def select_flooded_areas(seed=1, num_flooded_areas = 3):
     random.seed(seed)
     flooded_areas = random.sample(all_areas, num_flooded_areas)
     return flooded_areas
+

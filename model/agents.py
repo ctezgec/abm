@@ -182,3 +182,4 @@ class Government(Agent):
 
 
 # More agent classes can be added here, e.g. for insurance agents.
+

@@ -216,3 +216,4 @@ class AdaptationModel(Model):
         self.datacollector.collect(self)
         self.schedule.step()
 
+
