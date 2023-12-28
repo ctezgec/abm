@@ -1,5 +1,7 @@
 # Importing necessary libraries
 import random
+
+import self as self
 from mesa import Agent
 from shapely.geometry import Point
 from shapely import contains_xy
@@ -166,11 +168,11 @@ class Households(Agent):
 class Government(Agent):
 
     def __init__(self, model):
-        super().__init__(model)
-
+        super().__init__()
+        self.model = model
         self.subsidy_efficiency = self.efficiency_calculation()
 
-    def generate_households_data(number_of_households):
+    def generate_households_data(self):
         """
         Generate data for a given number of households.
 
@@ -184,8 +186,10 @@ class Government(Agent):
         households_data : dict
             A dictionary with household IDs as keys and subsidy information as values.
         """
+
+        number_of_households = self.model.schedule.number_of_households #add number of households from household agents
         households_data = {}
-        random.seed(seed)
+        random.seed(self.model.schedule.seed)
         for i in range(1, number_of_households + 1):
             household_id = f"household_{i-1}" #not sure i or i-1
             subsidy_info = {
@@ -197,7 +201,7 @@ class Government(Agent):
 
         return households_data
 
-    def bottom_20_saving(Households):
+    def bottom_20_saving(self):
         """
         Calculate the savings threshold that marks the bottom 20% of households.
 
@@ -211,8 +215,12 @@ class Government(Agent):
         threshold : float
             The savings threshold for the bottom 20%.
         """
+
         # Extract the savings from each household
-        savings_list = [agent.savings for agent in Households(Agent)] # NOT sure whether can collect data in this way
+        savings_list = []
+        for agent in self.model.schedule.agents:
+            if isinstance(agent, Households):
+                savings_list.append(agent.savings)
 
         # Calculate the 20th percentile
         savings_list.sort()
@@ -222,28 +230,31 @@ class Government(Agent):
         return threshold
 
     #no idea about this one yet, can delete this risk criterion
-    def top_20_risk():
+    def top_20_risk(self):
         pass
 
     # calculate estimated reduced damage / total estimated damage as an indicator to inform whether should adjust eligibility and percentage of subsidy
-    def efficiency_calculation():
+    def efficiency_calculation(self):
         estimated_reduced_damage = 0
         estimated_flood_damage = 0
-        for agent in Households(Agent):
-            estimated_flood_damage += Agent.flood_damage_estimated
-            if agent.is_elevated == True:
-                estimated_reduced_damage += Agent.flood_damage_estimated
-            elif agent.is_dryproofed == True:
-                estimated_reduced_damage += 0.5*Agent.flood_damage_estimated
-            elif agent.is_wetproofed == True:
-                estimated_reduced_damage += 0.4*Agent.flood_damage_estimated
-            else:
-                pass
-        return estimated_reduced_damage/estimated_flood_damage
+        for agent in self.model.schedule.agents:
+            if isinstance(agent, Households):
+                estimated_flood_damage += agent.flood_damage_estimated
+                if agent.is_elevated is True:
+                    estimated_reduced_damage += agent.flood_damage_estimated
+                elif agent.is_dryproofed is True:
+                    estimated_reduced_damage += 0.5*agent.flood_damage_estimated
+                elif agent.is_wetproofed is True:
+                    estimated_reduced_damage += 0.4*agent.flood_damage_estimated
+                else:
+                    pass
+            return estimated_reduced_damage/estimated_flood_damage
+
 
 
     def step(self, expected_efficiency = 0.3):
-        #here two options: 1. set a fixed threshold. 2. compare to the average
+        # here two options: 1. set a fixed threshold. 2. compare to the average
+        number_of_households = self.model.schedule.number_of_households
         subsidy_efficiency = self.efficiency_calculation()
         data1 = self.generate_households_data(number_of_households)
         if subsidy_efficiency < expected_efficiency:
