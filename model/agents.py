@@ -83,7 +83,7 @@ class Households(Agent):
         friends = self.model.grid.get_neighborhood(self.pos, include_center=False, radius=radius)
         return len(friends)
 
-  def step(self):
+    def step(self):
         # Logic for adaptation based on estimated flood damage and a random chance.
         # These conditions are examples and should be refined for real-world applications.
         self.age += 0.25  # Age increases by 1/4 every step (quarterly)
@@ -233,9 +233,9 @@ class Government(Agent):
             estimated_flood_damage += Agent.flood_damage_estimated
             if agent.is_elevated == True:
                 estimated_reduced_damage += Agent.flood_damage_estimated
-            elif self.is_dryproofed == True:
+            elif agent.is_dryproofed == True:
                 estimated_reduced_damage += 0.5*Agent.flood_damage_estimated
-            elif self.is_wetproofed == True:
+            elif agent.is_wetproofed == True:
                 estimated_reduced_damage += 0.4*Agent.flood_damage_estimated
             else:
                 pass
@@ -248,7 +248,7 @@ class Government(Agent):
         data1 = self.generate_households_data(number_of_households)
         if subsidy_efficiency < expected_efficiency:
             for agent in Households(Agent):
-                if agent.savings <= bottom_20_saving(Households):
+                if agent.savings <= self.bottom_20_saving(Households):
                     agentid = agent.unique_id
                     data1[agentid]['subsidy_percentage_elevation'] += 5
                     data1[agentid]['subsidy_percentage_elevation'] += 5
