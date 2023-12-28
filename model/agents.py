@@ -5,7 +5,7 @@ from shapely.geometry import Point
 from shapely import contains_xy
 
 # Import functions from functions.py
-from functions import generate_random_location_within_map_domain, get_flood_depth, calculate_basic_flood_damage, floodplain_multipolygon
+from functions import calculate_EU, generate_random_location_within_map_domain, get_flood_depth, calculate_basic_flood_damage, floodplain_multipolygon
 
 
 # Define the Households agent class
@@ -19,7 +19,14 @@ class Households(Agent):
     def __init__(self, unique_id, model):
         super().__init__(unique_id, model)
         self.is_adapted = False  # Initial adaptation status set to False
-        self.flood_probability = 0.3  # Probability of flooding
+# T0-DO: make probabilities more realistic, currently it is yearly probability
+        self.flood_type = self.model.map_choice  # Choice of flood map "harvey", "100yr", or "500yr"
+        if self.flood_type == "harvey":
+            self.flood_probability = 0.01  # Probability of flooding
+        elif self.flood_type == "100yr":
+            self.flood_probability = 0.01
+        elif self.flood_type == "500yr":
+            self.flood_probability = 0.002
     
         # Adaptation status for each type of measure
         self.is_elevated = False  # Initial elevation status set to False
@@ -27,7 +34,7 @@ class Households(Agent):
         self.is_wetproofed = False  # Initial wet-proofing status set to False
 
         # Demographic attributes
-        self.age = random.randint(20, 75)  # Age of the household
+        self.age = random.randint(20, 79)  # Age of the household
         self.income = random.randint(1000, 10000)  # Monthly income of the household
         self.initial_saving = random.randint(1,5) # how many income the household has saved
         self.savings = self.initial_saving*self.income  # Total savings of the household
@@ -76,11 +83,81 @@ class Households(Agent):
         friends = self.model.grid.get_neighborhood(self.pos, include_center=False, radius=radius)
         return len(friends)
 
-    def step(self):
+  def step(self):
         # Logic for adaptation based on estimated flood damage and a random chance.
         # These conditions are examples and should be refined for real-world applications.
-        if self.flood_damage_estimated > 0.15 and random.random() < 0.2:
-            self.is_adapted = True  # Agent adapts to flooding
+        self.age += 0.25  # Age increases by 1/4 every step (quarterly)
+        self.savings += self.monthly_saved*3  # Savings increase in a quarter 
+
+        if self.age >= 80:
+            #update the agent parameter (instead of removing and adding)
+            self.age = random.randint(20, 79)
+            self.income = random.randint(1000, 10000)
+            self.initial_saving = random.randint(1,5)
+            self.savings = self.initial_saving*self.income
+            self.saving_rate = 0.1
+            self.monthly_saved = self.income * self.saving_rate 
+
+        implemented_measures = []
+        if self.is_adapted==True:
+            # check which measures implemented 
+            if self.is_elevated:
+                implemented_measures.append('elevation')
+            if self.is_dryproofed:
+                implemented_measures.append('dryproofing')
+            if self.is_wetproofed:
+                implemented_measures.append('wetproofing')
+
+            # Check expiration of dryproofing measure
+            if "dryproofing" in implemented_measures:
+                self.dryproofing_lifetime -= 1      # quarterly decrease (total life time 20 years, i.e. 80 quarters)
+                if self.dryproofing_lifetime == 0:
+                    self.is_dryproofed = False
+                    implemented_measures.remove("dryproofing")
+                    # if no measure implemented except dryproofing, then the agent is not adapted
+                    if len(implemented_measures) == 0:
+                        self.is_adapted = False
+
+        # check which measures are available to implement
+        available_measures = [measure for measure in ['elevation', 'dryproofing', 'wetproofing'] if measure not in implemented_measures]
+
+# TO-DO: before checking the eligibility below, UPDATE THE COST OF MEASURES ACCORDING TO SUBSIDY
+        # if there is subsidy, self.xx_cost = new cost
+        
+        if len(available_measures) > 0:   # there are still measures available to implement
+            # check if the agent has enough savings to implement the measure
+            for measure in available_measures:
+                if measure == 'elevation':
+                    if self.savings < self.elevation_cost:
+                        available_measures.remove(measure)
+                elif measure == 'dryproofing':
+                    if self.savings < self.dryproofing_cost:
+                        available_measures.remove(measure)
+                elif measure == 'wetproofing':
+                    if self.savings < self.wetproofing_cost:
+                        available_measures.remove(measure)
+
+            if len(available_measures) > 0: # there are still available measures based on the agent's budget
+                    # create a dictionary with the available measures and their costs and efficiencies
+                    available_measures_info = {}
+                    for measure in available_measures:
+                        if measure == 'elevation':
+                            available_measures_info[measure] = [self.elevation_cost, self.elevation_efficiency]
+                        elif measure == 'dryproofing':
+                            available_measures_info[measure] = [self.dryproofing_cost, self.dryproofing_efficiency]
+                        elif measure == 'wetproofing':
+                            available_measures_info[measure] = [self.wetproofing_cost, self.wetproofing_efficiency]
+
+                    # choose a measure based on expected utility (available measures vs no action)
+                    self.adaptation_choice = calculate_EU(self.flood_probability, self.flood_damage_estimated,
+                                                          available_measures_info)
+                    
+                    # if measure implemented self adapted true
+                    # if measure is dryproofing then set lifetime to 80 quarters
+                    # update savings
+                    # if no measure implemented then self adapted false
+                    
+
 
 
 
@@ -167,8 +244,8 @@ class Government(Agent):
 
     def step(self, expected_efficiency = 0.3):
         #here two options: 1. set a fixed threshold. 2. compare to the average
-        subsidy_efficiency = efficiency_calculation()
-        data1 = generate_households_data(number_of_households)
+        subsidy_efficiency = self.efficiency_calculation()
+        data1 = self.generate_households_data(number_of_households)
         if subsidy_efficiency < expected_efficiency:
             for agent in Households(Agent):
                 if agent.savings <= bottom_20_saving(Households):

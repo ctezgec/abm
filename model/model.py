@@ -46,6 +46,10 @@ class AdaptationModel(Model):
         # defining the variables and setting the values
         self.number_of_households = number_of_households  # Total number of household agents
         self.seed = seed
+        
+        # Add flood map choice to model attributes, so it can be accessed by agents
+        self.map_choice = flood_map_choice  # Choice of flood map
+
 
         # network
         self.network = network # Type of network to be created
