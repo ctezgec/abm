@@ -47,9 +47,6 @@ class AdaptationModel(Model):
         self.number_of_households = number_of_households  # Total number of household agents
         self.seed = seed
 
-        # Add flood map choice to model attributes, so it can be accessed by agents
-        self.map_choice = flood_map_choice  # Choice of flood map
-
         # network
         self.network = network # Type of network to be created
         self.probability_of_network_connection = probability_of_network_connection
@@ -197,3 +194,25 @@ class AdaptationModel(Model):
         # Collect data and advance the model by one step
         self.datacollector.collect(self)
         self.schedule.step()
+
+#hav　not changed original one yet
+    def step(self):
+        """
+        Modify the model to introduce local flooding in specific areas.
+        """
+        if self.schedule.steps == 5:
+            # Determine the areas that will be flooded
+            flooded_areas = select_flooded_areas()
+
+            for agent in self.schedule.agents:
+                # Check if the agent is in a flooded area
+                if agent.location in flooded_areas:
+                    # Calculate the actual flood depth as a random number between 0.5 and 1.2 times the estimated flood depth
+                    agent.flood_depth_actual = random.uniform(0.5, 1.2) * agent.flood_depth_estimated
+                    # Calculate the actual flood damage given the actual flood depth
+                    agent.flood_damage_actual = calculate_basic_flood_damage(agent.flood_depth_actual)
+
+        # Collect data and advance the model by one step
+        self.datacollector.collect(self)
+        self.schedule.step()
+

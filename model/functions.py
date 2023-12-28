@@ -164,15 +164,55 @@ def calculate_basic_flood_damage(flood_depth):
     return flood_damage
 
 
-def calculate_EU(flood_probability, flood_damage, measure_information):
-    """
-    Calculates Expected Utility (EU) of households' flooding adaptation measures.
-        Parameters:
-            bla (float): explanation
-            bla (float): explanation
-            bla (dict): explanation
-        Return:
-            bla (str): explanation
 
+def divide_map_into_areas(flood_map, x=3):
     """
-    pass
+    Divide the flood map into x^2 local areas.
+
+    Parameters
+    ----------
+    flood_map: flood map in tif format
+    x: number of areas sqrt to divide the map into
+
+    Returns
+    -------
+    areas: a dictionary with area number as key and region boundaries as values
+    """
+    band, bound_l, bound_r, bound_t, bound_b = get_flood_map_data(flood_map)
+    num_rows = num_cols = int(x)
+
+    # Calculate the width and height of each area
+    width = (bound_r - bound_l) / num_cols
+    height = (bound_t - bound_b) / num_rows
+
+    areas = {}
+    area_number = 1
+
+    for i in range(num_rows):
+        for j in range(num_cols):
+            area_left = bound_l + j * width
+            area_right = area_left + width
+            area_top = bound_t - i * height
+            area_bottom = area_top - height
+
+            areas[area_number] = {
+                'left': area_left,
+                'right': area_right,
+                'top': area_top,
+                'bottom': area_bottom
+            }
+            area_number += 1
+
+    return areas
+
+
+# Example: Select 3 random areas from the divided areas to be flooded
+def select_flooded_areas(seed=1, num_flooded_areas = 3):
+    """
+    Selects a subset of areas to be flooded.
+    """
+    # Example: Select 3 random areas from the divided areas to be flooded
+    all_areas = list(divided_areas.keys())  # Assuming divided_areas is the dictionary of areas
+    random.seed(seed)
+    flooded_areas = random.sample(all_areas, num_flooded_areas)
+    return flooded_areas
