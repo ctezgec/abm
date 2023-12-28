@@ -19,7 +19,15 @@ class Households(Agent):
     def __init__(self, unique_id, model):
         super().__init__(unique_id, model)
         self.is_adapted = False  # Initial adaptation status set to False
-        self.flood_probability = 0.3  # Probability of flooding
+
+# T0-DO: make probabilities more realistic, currently it is yearly probability
+        self.flood_type = self.model.map_choice  # Choice of flood map "harvey", "100yr", or "500yr"
+        if self.flood_type == "harvey":
+            self.flood_probability = 0.01  # Probability of flooding
+        elif self.flood_type == "100yr":
+            self.flood_probability = 0.01
+        elif self.flood_type == "500yr":
+            self.flood_probability = 0.002
     
         # Adaptation status for each type of measure
         self.is_elevated = False  # Initial elevation status set to False
@@ -132,18 +140,18 @@ class Households(Agent):
 
             if len(available_measures) > 0: # there are still available measures based on the agent's budget
                     # create a dictionary with the available measures and their costs and efficiencies
-                    available_measures_dict = {}
+                    available_measures_info = {}
                     for measure in available_measures:
                         if measure == 'elevation':
-                            available_measures_dict[measure] = [self.elevation_cost, self.elevation_efficiency]
+                            available_measures_info[measure] = [self.elevation_cost, self.elevation_efficiency]
                         elif measure == 'dryproofing':
-                            available_measures_dict[measure] = [self.dryproofing_cost, self.dryproofing_efficiency]
+                            available_measures_info[measure] = [self.dryproofing_cost, self.dryproofing_efficiency]
                         elif measure == 'wetproofing':
-                            available_measures_dict[measure] = [self.wetproofing_cost, self.wetproofing_efficiency]
+                            available_measures_info[measure] = [self.wetproofing_cost, self.wetproofing_efficiency]
 
                     # choose a measure based on expected utility (available measures vs no action)
                     self.adaptation_choice = calculate_EU(self.flood_probability, self.flood_damage_estimated,
-                                                          available_measures_dict)
+                                                          available_measures_info)
                     
                     # if measure implemented self adapted true
                     # if measure is dryproofing then set lifetime to 80 quarters
