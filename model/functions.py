@@ -11,6 +11,7 @@ import math
 from shapely import contains_xy
 from shapely import prepare
 import geopandas as gpd
+from shapely.geometry import Point,Polygon
 
 def set_initial_values(input_data, parameter, seed):
     """
@@ -65,6 +66,7 @@ def get_flood_map_data(flood_map):
     bound_b = flood_map.bounds.bottom
     return band, bound_l, bound_r, bound_t, bound_b
 
+
 shapefile_path = r'../input_data/model_domain/houston_model/houston_model.shp'
 floodplain_path = r'../input_data/floodplain/floodplain_area.shp'
 
@@ -72,6 +74,9 @@ floodplain_path = r'../input_data/floodplain/floodplain_area.shp'
 map_domain_gdf = gpd.GeoDataFrame.from_file(shapefile_path)
 map_domain_gdf = map_domain_gdf.to_crs(epsg=26915)
 map_domain_geoseries = map_domain_gdf['geometry']
+
+print(map_domain_geoseries)
+
 map_minx, map_miny, map_maxx, map_maxy = map_domain_geoseries.total_bounds
 map_domain_polygon = map_domain_geoseries[0]  # The geoseries contains only one polygon
 prepare(map_domain_polygon)
@@ -176,20 +181,20 @@ def calculate_EU(flood_probability, flood_damage, measure_information):
     """
     pass
 
-def divide_map_into_areas(flood_map, x=3):
+def divide_map_into_areas(map_domain_geoseries, x=3):
     """
     Divide the flood map into x^2 local areas.
 
     Parameters
     ----------
-    flood_map: flood map in tif format
+    map_domain_geoseries: flood map geoseries
     x: number of areas sqrt to divide the map into
 
     Returns
     -------
     areas: a dictionary with area number as key and region boundaries as values
     """
-    band, bound_l, bound_r, bound_t, bound_b = get_flood_map_data(flood_map)
+    band, bound_l, bound_r, bound_t, bound_b = get_flood_map_data(map_domain_geoseries)
     num_rows = num_cols = int(x)
 
     # Calculate the width and height of each area
@@ -223,8 +228,48 @@ def select_flooded_areas(seed=1, num_flooded_areas = 3):
     Selects a subset of areas to be flooded.
     """
     # Example: Select 3 random areas from the divided areas to be flooded
+    divided_areas = divide_map_into_areas(map_domain_geoseries, x=3)
     all_areas = list(divided_areas.keys())  # Assuming divided_areas is the dictionary of areas
     random.seed(seed)
     flooded_areas = random.sample(all_areas, num_flooded_areas)
     return flooded_areas
 
+
+def flooded_in_local(x, y, map_domain_geoseries, seed=1, num_flooded_areas=3):
+    """
+    Check if a point (x, y) is in a flooded area.
+
+    Parameters
+    ----------
+    x, y: float
+        Coordinates of the point.
+    map_domain_geoseries: flood map geoseries
+    seed: int
+        Seed for random selection of flooded areas.
+    num_flooded_areas: int
+        Number of areas to be flooded.
+
+    Returns
+    -------
+    bool
+        True if the point is in a flooded area, False otherwise.
+    """
+    # Get the divided areas and select flooded areas
+    divided_areas = divide_map_into_areas(map_domain_geoseries, x=3)
+    flooded_areas_indices = select_flooded_areas(seed=seed, num_flooded_areas=num_flooded_areas)
+
+    # Create a Point object for the given coordinates
+    point = Point(x, y)
+
+    # Check if the point is in any of the flooded areas
+    for area_index in flooded_areas_indices:
+        area = divided_areas[area_index]
+        area_polygon = Polygon([(area['left'], area['top']),
+                                (area['right'], area['top']),
+                                (area['right'], area['bottom']),
+                                (area['left'], area['bottom'])])
+
+        if area_polygon.contains(point):
+            return True
+
+    return False

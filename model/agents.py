@@ -1,7 +1,7 @@
 # Importing necessary libraries
 import random
 
-import self as self
+# import self as self
 from mesa import Agent
 from shapely.geometry import Point
 from shapely import contains_xy
@@ -168,18 +168,14 @@ class Households(Agent):
 class Government(Agent):
 
     def __init__(self, model):
-        super().__init__()
+        super().__init__(model)
         self.model = model
         self.subsidy_efficiency = self.efficiency_calculation()
+        self.number_of_households = self.model.schedule.number_of_households
 
     def generate_households_data(self):
         """
         Generate data for a given number of households.
-
-        Parameters
-        ----------
-        number_of_households : int
-            The number of households to generate data for.
 
         Returns
         -------
@@ -205,11 +201,6 @@ class Government(Agent):
         """
         Calculate the savings threshold that marks the bottom 20% of households.
 
-        Parameters
-        ----------
-        households : iterable
-            An iterable of household agents.
-
         Returns
         -------
         threshold : float
@@ -217,10 +208,9 @@ class Government(Agent):
         """
 
         # Extract the savings from each household
-        savings_list = []
-        for agent in self.model.schedule.agents:
-            if isinstance(agent, Households):
-                savings_list.append(agent.savings)
+        # Let's say you want to create a list of household instances
+        household_instances = [Households(unique_id, model) for unique_id in range(number_of_households)]
+        savings_list = [household.savings for household in household_instances]
 
         # Calculate the 20th percentile
         savings_list.sort()
@@ -229,9 +219,6 @@ class Government(Agent):
 
         return threshold
 
-    #no idea about this one yet, can delete this risk criterion
-    def top_20_risk(self):
-        pass
 
     # calculate estimated reduced damage / total estimated damage as an indicator to inform whether should adjust eligibility and percentage of subsidy
     def efficiency_calculation(self):
@@ -256,10 +243,11 @@ class Government(Agent):
         # here two options: 1. set a fixed threshold. 2. compare to the average
         number_of_households = self.model.schedule.number_of_households
         subsidy_efficiency = self.efficiency_calculation()
-        data1 = self.generate_households_data(number_of_households)
+        data1 = generate_households_data(self.model.schedule.number_of_households)
         if subsidy_efficiency < expected_efficiency:
-            for agent in Households(Agent):
-                if agent.savings <= self.bottom_20_saving(Households):
+            household_agents = [Households(agent_id, model) for agent_id in range(number_of_agents)]
+            for agent in household_agents:
+                if agent.savings <= self.bottom_20_saving():
                     agentid = agent.unique_id
                     data1[agentid]['subsidy_percentage_elevation'] += 5
                     data1[agentid]['subsidy_percentage_elevation'] += 5

@@ -200,6 +200,7 @@ class AdaptationModel(Model):
         self.schedule.step()
 
 #hav　not changed original one yet
+    '''
     def step(self):
         """
         Modify the model to introduce local flooding in specific areas.
@@ -219,5 +220,6 @@ class AdaptationModel(Model):
         # Collect data and advance the model by one step
         self.datacollector.collect(self)
         self.schedule.step()
+        '''
 
 
