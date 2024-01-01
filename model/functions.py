@@ -178,15 +178,24 @@ def calculate_EU(savings, flood_probability, flood_damage, measure_information):
     # Check if the agent has enough savings to implement the measure
     affordable_measures = {}
     for measure in measure_information.keys():
-        if measure == 'elevation' and savings >= measure_information['elevation'][0]:
-            affordable_measures[measure] = measure_information['elevation']
-            
-        elif measure == 'dryproofing' and savings >= measure_information['dryproofing'][0]:
-            affordable_measures[measure] = measure_information['dryproofing']
+        if savings >= measure_information[measure][0]:
+            affordable_measures[measure] = measure_information[measure]
 
-        elif measure == 'wetproofing' and savings >= measure_information['wetproofing'][0]:
-            affordable_measures[measure] = measure_information['wetproofing']
-   
+    # Calculate the EU for no adaptation
+    EU_no_action = (flood_probability * np.log(savings -(savings * flood_damage)) +
+                            (1 - flood_probability) * np.log(savings))
+    
+    # Calculate the EU for each affordable measure
+    EU_measures = {}
+    for measure in affordable_measures.keys():
+        EU_measures[measure] = (flood_probability * np.log(savings - (savings * flood_damage) - affordable_measures[measure][0]) +
+                                (1 - flood_probability) * np.log(savings - affordable_measures[measure][0]))
+        
+    # Select the measure with the highest EU
+    EU_measures['no_action'] = EU_no_action
+    best_measure = max(EU_measures, key=EU_measures.get)
+    return best_measure
+    
 
 
 def divide_map_into_areas(flood_map, x=3):
