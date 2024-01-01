@@ -163,10 +163,11 @@ def calculate_basic_flood_damage(flood_depth):
         flood_damage = 0.1746 * math.log(flood_depth) + 0.6483
     return flood_damage
 
-def calculate_EU(flood_probability, flood_damage, measure_information):
+def calculate_EU(savings, flood_probability, flood_damage, measure_information):
     """
     Calculates Expected Utility (EU) of households' flooding adaptation measures.
         Parameters:
+            bla (float): explanation
             bla (float): explanation
             bla (float): explanation
             bla (dict): explanation
@@ -174,7 +175,19 @@ def calculate_EU(flood_probability, flood_damage, measure_information):
             bla (str): explanation
 
     """
-    pass
+    # Check if the agent has enough savings to implement the measure
+    affordable_measures = {}
+    for measure in measure_information.keys():
+        if measure == 'elevation' and savings >= measure_information['elevation'][0]:
+            affordable_measures[measure] = measure_information['elevation']
+            
+        elif measure == 'dryproofing' and savings >= measure_information['dryproofing'][0]:
+            affordable_measures[measure] = measure_information['dryproofing']
+
+        elif measure == 'wetproofing' and savings >= measure_information['wetproofing'][0]:
+            affordable_measures[measure] = measure_information['wetproofing']
+   
+
 
 def divide_map_into_areas(flood_map, x=3):
     """
