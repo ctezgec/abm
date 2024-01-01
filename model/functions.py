@@ -188,9 +188,12 @@ def calculate_EU(savings, flood_probability, flood_damage, measure_information):
     # Calculate the EU for each affordable measure
     EU_measures = {}
     for measure in affordable_measures.keys():
-        EU_measures[measure] = (flood_probability * np.log(savings - (savings * flood_damage) - affordable_measures[measure][0]) +
+        EU_measures[measure] = (flood_probability * np.log(savings - 
+                                                           (savings* flood_damage * (1 - affordable_measures[measure][1])) - 
+                                                           affordable_measures[measure][0]) +
                                 (1 - flood_probability) * np.log(savings - affordable_measures[measure][0]))
-        
+    
+    
     # Select the measure with the highest EU
     EU_measures['no_action'] = EU_no_action
     best_measure = max(EU_measures, key=EU_measures.get)
