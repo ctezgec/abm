@@ -189,7 +189,7 @@ class Government(Agent):
         households_data = {}
         random.seed(self.model.schedule.seed)
         for i in range(1, number_of_households + 1):
-            household_id = f"household_{i-1}" #not sure i or i-1
+            household_id = f"household_{i}" 
             subsidy_info = {
                 "subsidy_percentage_elevation": random.randint(50, 60),
                 "subsidy_percentage_dryproof": random.randint(10, 20),

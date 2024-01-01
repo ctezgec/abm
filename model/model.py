@@ -1,7 +1,7 @@
 # Importing necessary libraries
 import networkx as nx
 from mesa import Model, Agent
-from mesa.time import RandomActivation
+from mesa.time import RandomActivation, BaseScheduler   
 from mesa.space import NetworkGrid
 from mesa.datacollection import DataCollector
 import geopandas as gpd
@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import random
 
 # Import the agent class(es) from agents.py
-from agents import Households
+from agents import Households, Government
 
 # Import functions from functions.py
 from functions import get_flood_map_data, calculate_basic_flood_damage, select_flooded_areas
@@ -23,7 +23,7 @@ class AdaptationModel(Model):
     The main model running the simulation. It sets up the network of household agents,
     simulates their behavior, and collects data. The network type can be adjusted based on study requirements.
     """
-
+# TO-DO update number of households
     def __init__(self, 
                  seed = None,
                  number_of_households = 25, # number of household agents
@@ -65,19 +65,21 @@ class AdaptationModel(Model):
         # Initialize maps
         self.initialize_maps(flood_map_choice)
 
-        # set schedule for agents
-        self.schedule = RandomActivation(self)  # Schedule for activating agents
+        # set schedule for agents, since it is EU model, RandomActivation is not necessary
+        self.schedule = BaseScheduler(self)  # Schedule for activating agents
+
+        # create government agent
+        government = Government(unique_id = 0, model=self)
+        self.schedule.add(government)
 
         # create households through initiating a household on each node of the network graph
-        for i, node in enumerate(self.G.nodes()):
+        for i, node in enumerate(self.G.nodes(),start=1):
             household = Households(unique_id=i, model=self)
             self.schedule.add(household)
             self.grid.place_agent(agent=household, node_id=node)
 
-        # TO-DO CREATE GOVERNMENT AGENT HERE
-
         # Data collection setup to collect data
-        # TO-DO ADD MORE REPORTERS
+# TO-DO ADD MORE REPORTERS
         model_metrics = {
                         "total_adapted_households": self.total_adapted_households,
                         # ... other reporters ...
@@ -190,10 +192,11 @@ class AdaptationModel(Model):
         # TO DO LOCAL FLOODING OR OTHER GLOBAL FLOODINGS
         if self.schedule.steps == 5:
             for agent in self.schedule.agents:
-                # Calculate the actual flood depth as a random number between 0.5 and 1.2 times the estimated flood depth
-                agent.flood_depth_actual = random.uniform(0.5, 1.2) * agent.flood_depth_estimated
-                # calculate the actual flood damage given the actual flood depth
-                agent.flood_damage_actual = calculate_basic_flood_damage(agent.flood_depth_actual)
+                if isinstance(agent, Households):
+                    # Calculate the actual flood depth as a random number between 0.5 and 1.2 times the estimated flood depth
+                    agent.flood_depth_actual = random.uniform(0.5, 1.2) * agent.flood_depth_estimated
+                    # calculate the actual flood damage given the actual flood depth
+                    agent.flood_damage_actual = calculate_basic_flood_damage(agent.flood_depth_actual)
         
         # Collect data and advance the model by one step
         self.datacollector.collect(self)
