@@ -1,7 +1,5 @@
 # Importing necessary libraries
 import random
-
-import self as self
 from mesa import Agent
 from shapely.geometry import Point
 from shapely import contains_xy
