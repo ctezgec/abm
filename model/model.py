@@ -13,7 +13,7 @@ import random
 from agents import Households
 
 # Import functions from functions.py
-from functions import get_flood_map_data, calculate_basic_flood_damage
+from functions import get_flood_map_data, calculate_basic_flood_damage, select_flooded_areas
 from functions import map_domain_gdf, floodplain_gdf
 
 
