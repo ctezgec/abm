@@ -238,11 +238,11 @@ class Government(Agent):
         for agent in self.model.schedule.agents:
             if isinstance(agent, Households):
                 estimated_flood_damage += agent.flood_damage_estimated
-                if agent.is_elevated is True:
+                if agent.is_elevated:
                     estimated_reduced_damage += agent.flood_damage_estimated
-                elif agent.is_dryproofed is True:
+                elif agent.is_dryproofed:
                     estimated_reduced_damage += 0.5*agent.flood_damage_estimated
-                elif agent.is_wetproofed is True:
+                elif agent.is_wetproofed:
                     estimated_reduced_damage += 0.4*agent.flood_damage_estimated
                 else:
                     pass

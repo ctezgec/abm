@@ -218,10 +218,11 @@ def divide_map_into_areas(flood_map, x=3):
 
 
 # Example: Select 3 random areas from the divided areas to be flooded
-def select_flooded_areas(seed=1, num_flooded_areas = 3):
+def select_flooded_areas(flood_map, seed=1, num_flooded_areas = 3):
     """
     Selects a subset of areas to be flooded.
     """
+    divided_areas = divide_map_into_areas(flood_map)
     # Example: Select 3 random areas from the divided areas to be flooded
     all_areas = list(divided_areas.keys())  # Assuming divided_areas is the dictionary of areas
     random.seed(seed)
