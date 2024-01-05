@@ -167,38 +167,53 @@ def calculate_EU(savings, flood_probability, flood_damage, measure_information):
     """
     Calculates Expected Utility (EU) of households' flooding adaptation measures.
         Parameters:
-            bla (float): explanation
-            bla (float): explanation
-            bla (float): explanation
-            bla (dict): explanation
+            savings (int): Amount of savings of the agent
+            flood_probability (float): Probability of flooding (between 0 and 1)
+            flood_damage (float): Damage coefficient of flooding (between 0 and 1)
+            measures (dict): Dictionary with information about the measures
+                             measures = {'measure_name': [cost, damage_reduction]}
         Return:
-            bla (str): explanation
+            best_measure (dict): Dict with info about the measure with the highest EU (including no_action)
 
     """
-    # Check if the agent has enough savings to implement the measure
-    affordable_measures = {}
-    for measure in measure_information.keys():
-        if savings >= measure_information[measure][0]:
-            affordable_measures[measure] = measure_information[measure]
 
-    # Calculate the EU for no adaptation
-    EU_no_action = (flood_probability * np.log(savings -(savings * flood_damage)) +
-                            (1 - flood_probability) * np.log(savings))
+    # If entire savings are wiped out, no measures can be implemented (to prevent log0 error)
+    if flood_damage == 1:
+        best_measure_dict = {'measure':'no_action', 'cost': 0, 'efficiency': 0}
+        return best_measure_dict
     
-    # Calculate the EU for each affordable measure
-    EU_measures = {}
-    for measure in affordable_measures.keys():
-        EU_measures[measure] = (flood_probability * np.log(savings - 
-                                                           (savings* flood_damage * (1 - affordable_measures[measure][1])) - 
-                                                           affordable_measures[measure][0]) +
-                                (1 - flood_probability) * np.log(savings - affordable_measures[measure][0]))
-    
-    
-    # Select the measure with the highest EU
-    EU_measures['no_action'] = EU_no_action
-    best_measure = max(EU_measures, key=EU_measures.get)
-    return best_measure
-    
+    else:    
+        # Check if the agent has enough savings to implement the measure
+        affordable_measures = {}
+        for measure in measure_information.keys():
+            if savings >= measure_information[measure][0]:
+                affordable_measures[measure] = measure_information[measure]
+
+        # Calculate the EU for no adaptation
+        EU_no_action = (flood_probability * np.log(savings -(savings * flood_damage)) +
+                                (1 - flood_probability) * np.log(savings))
+        
+        # Calculate the EU for each affordable measure
+        EU_measures = {}
+        for measure in affordable_measures.keys():
+            EU_measures[measure] = (flood_probability * np.log(savings - 
+                                                            (savings* flood_damage * (1 - affordable_measures[measure][1])) - 
+                                                            affordable_measures[measure][0]) +
+                                    (1 - flood_probability) * np.log(savings - affordable_measures[measure][0]))
+        
+        
+        # Select the measure with the highest EU
+        EU_measures['no_action'] = EU_no_action
+        best_measure = max(EU_measures, key=EU_measures.get)
+            
+        if best_measure == 'no_action':
+            best_measure_dict = {'measure':best_measure, 'cost': 0, 'efficiency': 0}
+        else:
+            best_measure_dict = {'measure': best_measure, 
+                                 'cost': measure_information[best_measure][0], 
+                                 'efficiency': measure_information[best_measure][1]}
+            
+        return best_measure_dict
 
 
 def divide_map_into_areas(flood_map, x=3):
