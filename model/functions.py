@@ -174,6 +174,8 @@ def calculate_EU(savings, flood_probability, flood_damage, measure_information):
                              measures = {'measure_name': [cost, damage_reduction]}
         Return:
             best_measure (dict): Dict with info about the measure with the highest EU (including no_action)
+                                best_measure = {'measure': 'measure_name', 'cost': cost, 
+                                'efficiency': damage_reduction}
 
     """
 
