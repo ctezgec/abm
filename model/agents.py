@@ -36,7 +36,7 @@ class Households(Agent):
         # Demographic attributes
         self.age = random.randint(20, 79)  # Age of the household
         self.income = random.randint(1000, 10000)  # Monthly income of the household
-        self.initial_saving = random.randint(1,5) # how many income the household has saved
+        self.initial_saving = random.randint(1,10) # how many income the household has saved
         self.savings = self.initial_saving*self.income  # Total savings of the household
         self.saving_rate = 0.1  # Monthly saving rate of the household
         self.monthly_saved = self.income * self.saving_rate  # Monthly savings of the household
