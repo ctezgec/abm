@@ -35,10 +35,10 @@ class Households(Agent):
 
         # Demographic attributes
         self.age = random.randint(20, 79)  # Age of the household
-        self.income = random.randint(1000, 10000)  # Monthly income of the household
-        self.initial_saving = random.randint(1,10) # how many income the household has saved
-        self.savings = self.initial_saving*self.income  # Total savings of the household
-        self.saving_rate = 0.1  # Monthly saving rate of the household
+        self.income = self.generate_income()  # Monthly income of the household
+        self.savings_number= random.randint(1,3) # how many income the household has saved
+        self.savings = self.savings_number*self.income  # Total initial savings of the household
+        self.saving_rate = 0.05  # Monthly saving rate of the household
         self.monthly_saved = self.income * self.saving_rate  # Monthly savings of the household
 
         # Measure costs and efficiencies
@@ -76,7 +76,31 @@ class Households(Agent):
         
         #calculate the actual flood damage given the actual flood depth. Flood damage is a factor between 0 and 1
         self.flood_damage_actual = calculate_basic_flood_damage(flood_depth=self.flood_depth_actual)
+   
+    # Function to calculate income for households
+    def generate_income(self, alpha=1, beta=3000):
+        while True:
+            income = random.gammavariate(alpha, beta)
+            if 1000 <= income <= 50000: # min and max cap for income
+                return int(income)
     
+    def calculate_saving(self, saving_threshold= 0.25):
+    # Generating a random number between 0 and 1
+        saving_rate = self.saving_rate
+        # select consumption rate from the list
+        consumption_rate = random.choice([0.05, 0.1, 0.15, 0.2, 0.25])  
+
+        #random.seed(self.model.seed)
+        if random.random() > saving_threshold:
+            # Agent saves
+            amount_saved = self.income * saving_rate *3 # quarterly saving
+            self.savings += amount_saved
+        else:
+            # Agent consumes from their savings (for other purposes)
+            amount_consumed = self.savings * consumption_rate # it is already quarterly
+            self.savings -= amount_consumed
+
+            
     # Function to count friends who can be influencial.
     def count_friends(self, radius):
         """Count the number of neighbors within a given radius (number of edges away). This is social relation and not spatial"""
@@ -87,15 +111,17 @@ class Households(Agent):
         # Logic for adaptation based on estimated flood damage and a random chance.
         # These conditions are examples and should be refined for real-world applications.
         self.age += 0.25  # Age increases by 1/4 every step (quarterly)
-        self.savings += self.monthly_saved*3  # Savings increase in a quarter 
+        #self.savings += self.monthly_saved*3  
+        self.calculate_saving() # Savings updated
 
         if self.age >= 80:
             #update the agent parameter (instead of removing and adding)
+            self.is_adapted = False
             self.age = random.randint(20, 79)
-            self.income = random.randint(1000, 10000)
-            self.initial_saving = random.randint(1,5)
+            self.income = self.generate_income()
+            self.initial_saving = random.randint(1,3)
             self.savings = self.initial_saving*self.income
-            self.saving_rate = 0.1
+            self.saving_rate = 0.05
             self.monthly_saved = self.income * self.saving_rate 
 
         implemented_measures = []
@@ -144,13 +170,13 @@ class Households(Agent):
             adaptation_efficiency = adaptation_choice_dict['efficiency']
         
         # If an agent decides to adapt
-        if adaptation_choice != 'no action':
-            if self.adaptation_choice == 'elevation':
+        if adaptation_choice != 'no_action':
+            if adaptation_choice == 'elevation':
                 self.is_elevated = True
-            if self.adaptation_choice == 'dryproofing':
+            if adaptation_choice == 'dryproofing':
                 self.is_dryproofed = True
                 self.dryproofing_lifetime = 80
-            if self.adaptation_choice == 'wetproofing':
+            if adaptation_choice == 'wetproofing':
                 self.is_wetproofed = True
 
             # update the savings of the agent
@@ -168,9 +194,8 @@ class Households(Agent):
 # Define the Government agent class
 class Government(Agent):
 
-    def __init__(self, model):
-        super().__init__()
-        self.model = model
+    def __init__(self, unique_id, model):
+        super().__init__(unique_id,model)
         self.subsidy_efficiency = self.efficiency_calculation()
 
     def generate_households_data(self):

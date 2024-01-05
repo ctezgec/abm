@@ -69,8 +69,8 @@ class AdaptationModel(Model):
         self.schedule = BaseScheduler(self)  # Schedule for activating agents
 
         # create government agent
-        government = Government(unique_id = 0, model=self)
-        self.schedule.add(government)
+        #government = Government(unique_id = 0, model=self)
+        #self.schedule.add(government)
 
         # create households through initiating a household on each node of the network graph
         for i, node in enumerate(self.G.nodes(),start=1):
