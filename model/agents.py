@@ -83,9 +83,9 @@ class Households(Agent):
             income = random.gammavariate(alpha, beta)
             if 1000 <= income <= 50000: # min and max cap for income
                 return int(income)
-    
+            
+    # Function to calculate savings update (households save or consume from their savings)
     def calculate_saving(self, saving_threshold= 0.25):
-    # Generating a random number between 0 and 1
         saving_rate = self.saving_rate
         # select consumption rate from the list
         consumption_rate = random.choice([0.05, 0.1, 0.15, 0.2, 0.25])  
@@ -169,7 +169,7 @@ class Households(Agent):
             adaptation_cost = adaptation_choice_dict['cost']
             adaptation_efficiency = adaptation_choice_dict['efficiency']
         
-        # If an agent decides to adapt
+        # If an agent decides to adapt, update the attributes 
         if adaptation_choice != 'no_action':
             if adaptation_choice == 'elevation':
                 self.is_elevated = True
@@ -212,10 +212,10 @@ class Government(Agent):
         households_data : dict
             A dictionary with household IDs as keys and subsidy information as values.
         """
-
-        number_of_households = self.model.schedule.number_of_households #add number of households from household agents
+        # get the number of households
+        number_of_households = self.model.schedule.get_agent_count() - 1  # remove the government agent
         households_data = {}
-        random.seed(self.model.schedule.seed)
+        random.seed(self.model.seed)
         for i in range(1, number_of_households + 1):
             household_id = f"household_{i}" 
             subsidy_info = {
@@ -255,10 +255,6 @@ class Government(Agent):
 
         return threshold
 
-    #no idea about this one yet, can delete this risk criterion
-    def top_20_risk(self):
-        pass
-
     # calculate estimated reduced damage / total estimated damage as an indicator to inform whether should adjust eligibility and percentage of subsidy
     def efficiency_calculation(self):
         estimated_reduced_damage = 0
@@ -267,16 +263,14 @@ class Government(Agent):
             if isinstance(agent, Households):
                 estimated_flood_damage += agent.flood_damage_estimated
                 if agent.is_elevated:
-                    estimated_reduced_damage += agent.flood_damage_estimated
+                    estimated_reduced_damage += 0.9*agent.flood_damage_estimated
                 elif agent.is_dryproofed:
                     estimated_reduced_damage += 0.5*agent.flood_damage_estimated
                 elif agent.is_wetproofed:
                     estimated_reduced_damage += 0.4*agent.flood_damage_estimated
                 else:
                     pass
-            return estimated_reduced_damage/estimated_flood_damage
-
-
+        return estimated_reduced_damage/estimated_flood_damage
 
     def step(self, expected_efficiency = 0.3):
         # here two options: 1. set a fixed threshold. 2. compare to the average
