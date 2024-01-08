@@ -274,9 +274,9 @@ class Government(Agent):
 
     def step(self, expected_efficiency = 0.3):
         # here two options: 1. set a fixed threshold. 2. compare to the average
-        number_of_households = self.model.schedule.number_of_households
+        # number_of_households = self.model.schedule.number_of_households
         subsidy_efficiency = self.efficiency_calculation()
-        data1 = self.generate_households_data(number_of_households)
+        data1 = self.generate_households_data()
         if subsidy_efficiency < expected_efficiency:
             for agent in Households(Agent):
                 if agent.savings <= self.bottom_20_saving(Households):
