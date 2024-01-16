@@ -13,7 +13,7 @@ import random
 from agents import Households, Government
 
 # Import functions from functions.py
-from functions import get_flood_map_data, calculate_basic_flood_damage, select_flooded_areas
+from functions import get_flood_map_data, calculate_basic_flood_damage
 from functions import map_domain_gdf, floodplain_gdf
 
 
@@ -23,10 +23,11 @@ class AdaptationModel(Model):
     The main model running the simulation. It sets up the network of household agents,
     simulates their behavior, and collects data. The network type can be adjusted based on study requirements.
     """
-# TO-DO update number of households
     def __init__(self, 
                  seed = None,
                  number_of_households = 25, # number of household agents
+                 subsidy_percentage = 0, # subsidy percentage available,
+                 income_threshold  = 2000, # monthly income threshold for subsidy eligibility 
                  # Simplified argument for choosing flood map. Can currently be "harvey", "100yr", or "500yr".
                  flood_map_choice='harvey',
                  # ### network related parameters ###
@@ -38,7 +39,7 @@ class AdaptationModel(Model):
                  # number of edges for BA network
                  number_of_edges = 3,
                  # number of nearest neighbours for WS social network
-                 number_of_nearest_neighbours = 5,
+                 number_of_nearest_neighbours = 5
                  ):
         
         super().__init__(seed = seed)
@@ -46,7 +47,9 @@ class AdaptationModel(Model):
         # defining the variables and setting the values
         self.number_of_households = number_of_households  # Total number of household agents
         self.seed = seed
-        
+        self.subsidy_percentage = subsidy_percentage # subsidy percentage given to households, integer between 0 and 100.
+        self.income_threshold = income_threshold # income threshold defined for subsidy eligibility
+
         # Add flood map choice to model attributes, so it can be accessed by agents
         self.map_choice = flood_map_choice  # Choice of flood map
 
@@ -67,10 +70,6 @@ class AdaptationModel(Model):
 
         # set schedule for agents, since it is EU model, RandomActivation is not necessary
         self.schedule = BaseScheduler(self)  # Schedule for activating agents
-
-        # create government agent
-        #government = Government(unique_id = 0, model=self)
-        #self.schedule.add(government)
 
         # create households through initiating a household on each node of the network graph
         for i, node in enumerate(self.G.nodes(),start=1):
@@ -201,25 +200,5 @@ class AdaptationModel(Model):
         # Collect data and advance the model by one step
         self.datacollector.collect(self)
         self.schedule.step()
-
-    #def step(self):
-        """
-        Modify the model to introduce local flooding in specific areas.
-        """
-        #if self.schedule.steps == 5:
-            # Determine the areas that will be flooded
-            #flooded_areas = select_flooded_areas()
-
-            #for agent in self.schedule.agents:
-                # Check if the agent is in a flooded area
-                #if agent.location in flooded_areas:
-                    # Calculate the actual flood depth as a random number between 0.5 and 1.2 times the estimated flood depth
-                    #agent.flood_depth_actual = random.uniform(0.5, 1.2) * agent.flood_depth_estimated
-                    # Calculate the actual flood damage given the actual flood depth
-                    #agent.flood_damage_actual = calculate_basic_flood_damage(agent.flood_depth_actual)
-
-        # Collect data and advance the model by one step
-        #self.datacollector.collect(self)
-        #self.schedule.step()
 
 

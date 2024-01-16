@@ -208,95 +208,13 @@ class Households(Agent):
 
 # Define the Government agent class
 class Government(Agent):
-
+    """
+    A government agent that currently doesn't perform any actions.
+    """
     def __init__(self, unique_id, model):
-        super().__init__(unique_id,model)
-        self.subsidy_efficiency = self.efficiency_calculation()
+        super().__init__(unique_id, model)
 
-    def generate_households_data(self):
-        """
-        Generate data for a given number of households.
-
-        Parameters
-        ----------
-        number_of_households : int
-            The number of households to generate data for.
-
-        Returns
-        -------
-        households_data : dict
-            A dictionary with household IDs as keys and subsidy information as values.
-        """
-        # get the number of households
-        number_of_households = self.model.schedule.get_agent_count() - 1  # remove the government agent
-        households_data = {}
-        random.seed(self.model.seed)
-        for i in range(1, number_of_households + 1):
-            household_id = f"household_{i}" 
-            subsidy_info = {
-                "subsidy_percentage_elevation": random.randint(50, 60),
-                "subsidy_percentage_dryproof": random.randint(10, 20),
-                "subsidy_percentage_wetproof": random.randint(30, 40)
-            }
-            households_data[household_id] = subsidy_info
-
-        return households_data
-
-    def bottom_20_saving(self):
-        """
-        Calculate the savings threshold that marks the bottom 20% of households.
-
-        Parameters
-        ----------
-        households : iterable
-            An iterable of household agents.
-
-        Returns
-        -------
-        threshold : float
-            The savings threshold for the bottom 20%.
-        """
-
-        # Extract the savings from each household
-        savings_list = []
-        for agent in self.model.schedule.agents:
-            if isinstance(agent, Households):
-                savings_list.append(agent.savings)
-
-        # Calculate the 20th percentile
-        savings_list.sort()
-        index = int(0.2 * len(savings_list)) - 1
-        threshold = savings_list[max(index, 0)]
-
-        return threshold
-
-    # calculate estimated reduced damage / total estimated damage as an indicator to inform whether should adjust eligibility and percentage of subsidy
-    def efficiency_calculation(self):
-        estimated_reduced_damage = 0
-        estimated_flood_damage = 0
-        for agent in self.model.schedule.agents:
-            if isinstance(agent, Households):
-                estimated_flood_damage += agent.flood_damage_estimated
-                if agent.is_elevated:
-                    estimated_reduced_damage += 0.9*agent.flood_damage_estimated
-                elif agent.is_dryproofed:
-                    estimated_reduced_damage += 0.5*agent.flood_damage_estimated
-                elif agent.is_wetproofed:
-                    estimated_reduced_damage += 0.4*agent.flood_damage_estimated
-                else:
-                    pass
-        return estimated_reduced_damage/estimated_flood_damage
-
-    def step(self, expected_efficiency = 0.3):
-        # here two options: 1. set a fixed threshold. 2. compare to the average
-        # number_of_households = self.model.schedule.number_of_households
-        subsidy_efficiency = self.efficiency_calculation()
-        data1 = self.generate_households_data()
-        if subsidy_efficiency < expected_efficiency:
-            for agent in Households(Agent):
-                if agent.savings <= self.bottom_20_saving(Households):
-                    agentid = agent.unique_id
-                    data1[agentid]['subsidy_percentage_elevation'] += 5
-                    data1[agentid]['subsidy_percentage_elevation'] += 5
-                    data1[agentid]['subsidy_percentage_elevation'] += 5
+    def step(self):
+        # The government agent doesn't perform any actions.
+        pass
 

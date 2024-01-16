@@ -179,45 +179,39 @@ def calculate_EU(savings, flood_probability, flood_damage, measure_information):
                                 'efficiency': damage_reduction}
 
     """
-
-    # If entire savings are wiped out, no measures can be implemented (to prevent log0 error)
-    if flood_damage == 1:  # highest damage factor
-        best_measure_dict = {'measure':'no_action', 'cost': 0, 'efficiency': 0}
-        return best_measure_dict
-    
-    else:    
-        # Check if the agent has enough savings to implement the measure
-        affordable_measures = {}
-        for measure in measure_information.keys():
-            if savings >= measure_information[measure][0]:
-                affordable_measures[measure] = measure_information[measure]
+    epsilon = 1e-10  # small constant (preventing log0 error)
+    # Check if the agent has enough savings to implement the measure
+    affordable_measures = {}
+    for measure in measure_information.keys():
+        damage_left = savings * flood_damage * (1-measure_information[measure][1])
+        if savings >= measure_information[measure][0] + damage_left:
+            affordable_measures[measure] = measure_information[measure]
 
         # Calculate the EU for no adaptation
-        EU_no_action = (flood_probability * np.log(savings -(savings * flood_damage)) +
-                                (1 - flood_probability) * np.log(savings))
+    EU_no_action = (flood_probability * np.log(savings -(savings * flood_damage) + epsilon) +
+                                (1 - flood_probability) * np.log(savings + epsilon))
+    
         
         # Calculate the EU for each affordable measure
-        EU_measures = {}
-        for measure in affordable_measures.keys():
-            EU_measures[measure] = (flood_probability * np.log(savings - 
+    EU_measures = {}
+    for measure in affordable_measures.keys():
+        EU_measures[measure] = (flood_probability * np.log(savings - 
                                                             (savings* flood_damage * (1 - affordable_measures[measure][1])) - 
-                                                            affordable_measures[measure][0]) +
-                                    (1 - flood_probability) * np.log(savings - affordable_measures[measure][0]))
+                                                            affordable_measures[measure][0] + epsilon) +
+                                    (1 - flood_probability) * np.log(savings - affordable_measures[measure][0] + epsilon))
         
         
         # Select the measure with the highest EU
-        EU_measures['no_action'] = EU_no_action
-        best_measure = max(EU_measures, key=EU_measures.get)
+    EU_measures['no_action'] = EU_no_action
+    best_measure = max(EU_measures, key=EU_measures.get)
             
-        if best_measure == 'no_action':
-            best_measure_dict = {'measure':best_measure, 'cost': 0, 'efficiency': 0}
-        else:
-            best_measure_dict = {'measure': best_measure, 
+    if best_measure == 'no_action':
+        best_measure_dict = {'measure':best_measure, 'cost': 0, 'efficiency': 0}
+    else:
+        best_measure_dict = {'measure': best_measure, 
                                  'cost': measure_information[best_measure][0], 
                                  'efficiency': measure_information[best_measure][1]}
             
-        return best_measure_dict
-
-
+    return best_measure_dict
 
 
