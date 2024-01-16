@@ -90,6 +90,8 @@ class AdaptationModel(Model):
                         "FloodDepthActual": "flood_depth_actual",
                         "FloodDamageActual" : "flood_damage_actual",
                         "IsAdapted": "is_adapted",
+                        "Income":"income",
+                        "Savings":"savings",
                         "FriendsCount": lambda a: a.count_friends(radius=1),
                         "location":"location",
                         # ... other reporters ...

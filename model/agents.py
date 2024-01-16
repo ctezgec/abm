@@ -39,7 +39,7 @@ class Households(Agent):
         self.savings_number= random.randint(1,3) # how many income the household has saved
         self.savings = self.savings_number*self.income  # Total initial savings of the household
         self.saving_rate = 0.05  # Monthly saving rate of the household
-        self.monthly_saved = self.income * self.saving_rate  # Monthly savings of the household
+        
 
         # Measure costs and efficiencies
         self.elevation_cost =  random.randint(30000, 40000)  # Cost of elevation
@@ -47,7 +47,7 @@ class Households(Agent):
         self.dryproofing_cost = random.randint(5500, 6500)  # Cost of dry-proofing
         self.dryproofing_efficiency = 0.5  # Efficiency of dry-proofing
         self.wetproofing_cost = random.randint(6500, 8000)  # Cost of wet-proofing
-        self.wetproofing_efficiency = 0.4  # Efficiency of wet-proofing
+        self.wetproofing_efficiency = 0.6  # Efficiency of wet-proofing
     
         # getting flood map values
         # Get a random location on the map
@@ -134,10 +134,10 @@ class Households(Agent):
             self.is_adapted = False
             self.age = random.randint(20, 79)
             self.income = self.generate_income()
-            self.initial_saving = random.randint(1,3)
-            self.savings = self.initial_saving*self.income
-            self.saving_rate = 0.05
-            self.monthly_saved = self.income * self.saving_rate 
+            self.savings_number = random.randint(1,3)
+            self.savings = self.savings_number*self.income
+            self.saving_rate = 0.2 #change
+    
 
         implemented_measures = []
         if self.is_adapted==True:
@@ -154,6 +154,8 @@ class Households(Agent):
                 self.dryproofing_lifetime -= 1      # quarterly decrease (total life time 20 years, i.e. 80 quarters)
                 if self.dryproofing_lifetime == 0:
                     self.is_dryproofed = False
+                    self.flood_damage_estimated = self.flood_damage_estimated_old
+                    self.flood_damage_actual = self.flood_damage_estimated_old
                     implemented_measures.remove("dryproofing")
                     # if no measure implemented except dryproofing, then the agent is not adapted
                     if len(implemented_measures) == 0:
@@ -184,26 +186,26 @@ class Households(Agent):
             adaptation_cost = adaptation_choice_dict['cost']
             adaptation_efficiency = adaptation_choice_dict['efficiency']
         
-        # If an agent decides to adapt, update the attributes 
-        if adaptation_choice != 'no_action':
-            if adaptation_choice == 'elevation':
-                self.is_elevated = True
-            if adaptation_choice == 'dryproofing':
-                self.is_dryproofed = True
-                self.dryproofing_lifetime = 80
-            if adaptation_choice == 'wetproofing':
-                self.is_wetproofed = True
+            # If an agent decides to adapt, update the attributes 
+            if adaptation_choice != 'no_action':
+                if adaptation_choice == 'elevation':
+                    self.is_elevated = True
+                if adaptation_choice == 'dryproofing':
+                    self.is_dryproofed = True
+                    self.dryproofing_lifetime = 80
+                if adaptation_choice == 'wetproofing':
+                    self.is_wetproofed = True
 
-            # update the savings of the agent
-            self.savings -= adaptation_cost
-            # keep track of the old estimated and actual damage (before measures)
-            self.flood_damage_estimated_old = self.flood_damage_estimated 
-            self.flood_damage_actual_old = self.flood_damage_actual
-            # update the estimated and actual damage (after measures)
-            self.flood_damage_actual =  self.flood_damage_actual * (1-adaptation_efficiency)
-            self.flood_damage_estimated = self.flood_damage_estimated * (1-adaptation_efficiency)
-            # update the adaptation status
-            self.is_adapted = True
+                # update the savings of the agent
+                self.savings -= adaptation_cost
+                # keep track of the old estimated and actual damage (before measures)
+                self.flood_damage_estimated_old = self.flood_damage_estimated 
+                self.flood_damage_actual_old = self.flood_damage_actual
+                # update the estimated and actual damage (after measures)
+                self.flood_damage_actual =  self.flood_damage_actual * (1-adaptation_efficiency)
+                self.flood_damage_estimated = self.flood_damage_estimated * (1-adaptation_efficiency)
+                # update the adaptation status
+                self.is_adapted = True
 
 
 # Define the Government agent class
