@@ -5,7 +5,7 @@ from shapely.geometry import Point
 from shapely import contains_xy
 
 # Import functions from functions.py
-from functions import calculate_EU, generate_random_location_within_map_domain, get_flood_depth, calculate_basic_flood_damage, floodplain_multipolygon
+from functions import calculate_EU, generate_random_location_within_map_domain, get_flood_depth, calculate_basic_flood_damage, floodplain_multipolygon, generate_random_number
 
 
 # Define the Households agent class
@@ -38,16 +38,15 @@ class Households(Agent):
         self.income = self.generate_income()  # Monthly income of the household
         self.savings_number= random.randint(1,3) # how many income the household has saved
         self.savings = self.savings_number*self.income  # Total initial savings of the household
-        self.saving_rate = 0.05  # Monthly saving rate of the household
         
 
         # Measure costs and efficiencies
         self.elevation_cost =  random.randint(30000, 40000)  # Cost of elevation
-        self.elevation_efficiency = 0.9  # Efficiency of elevation
-        self.dryproofing_cost = random.randint(5500, 6500)  # Cost of dry-proofing
+        self.elevation_efficiency = 1  # Efficiency of elevation
+        self.dryproofing_cost = random.randint(5000, 9000)  # Cost of dry-proofing
         self.dryproofing_efficiency = 0.5  # Efficiency of dry-proofing
-        self.wetproofing_cost = random.randint(6500, 8000)  # Cost of wet-proofing
-        self.wetproofing_efficiency = 0.6  # Efficiency of wet-proofing
+        self.wetproofing_cost = random.randint(3500, 8000)  # Cost of wet-proofing
+        self.wetproofing_efficiency = 0.4  # Efficiency of wet-proofing
     
         # getting flood map values
         # Get a random location on the map
@@ -101,9 +100,10 @@ class Households(Agent):
         Return: 
             None
         '''
-        saving_rate = self.saving_rate
         # select consumption rate from the list
         consumption_rate = random.choice([0.05, 0.1, 0.15, 0.2, 0.25])  
+        # select saving rate from the list 
+        saving_rate =  random.choice([0.05, 0.1, 0.15, 0.2, 0.25]) 
 
         #random.seed(self.model.seed)
         if random.random() > saving_threshold:

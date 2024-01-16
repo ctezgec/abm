@@ -214,4 +214,16 @@ def calculate_EU(savings, flood_probability, flood_damage, measure_information):
             
     return best_measure_dict
 
-
+def generate_random_number(mean, min_value, max_value, std_deviation):
+    """
+    Generate a random number based on a normal distribution.
+    Parameters:
+        mean (float): Mean of the distribution
+        min_value (float): Minimum value of the distribution
+        max_value (float): Maximum value of the distribution
+        std_deviation (float): Standard deviation of the distribution
+    Return:
+        random_number (float): Random number"""
+    random_number = np.random.normal(mean, std_deviation)
+    random_number = max(min_value, min(max_value, random_number))
+    return random_number

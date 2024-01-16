@@ -78,10 +78,11 @@ class AdaptationModel(Model):
             self.grid.place_agent(agent=household, node_id=node)
 
         # Data collection setup to collect data
-# TO-DO ADD MORE REPORTERS
         model_metrics = {
                         "total_adapted_households": self.total_adapted_households,
-                        # ... other reporters ...
+                        "total_dryproofed_households": self.total_dryproofed_households,
+                        "total_wetproofed_households": self.total_wetproofed_households,
+                        "total_elevated_households": self.total_elevated_households
                         }
         
         agent_metrics = {
@@ -90,15 +91,17 @@ class AdaptationModel(Model):
                         "FloodDepthActual": "flood_depth_actual",
                         "FloodDamageActual" : "flood_damage_actual",
                         "IsAdapted": "is_adapted",
+                        "IsElevated":"is_elevated",
+                        "IsDryproofed":"is_dryproofed",
+                        "IsWetproofed":"is_wetproofed",
                         "Income":"income",
                         "Savings":"savings",
-                        "FriendsCount": lambda a: a.count_friends(radius=1),
+                        "Age":"age",
                         "location":"location",
-                        # ... other reporters ...
                         }
+        
         #set up the data collector 
         self.datacollector = DataCollector(model_reporters=model_metrics, agent_reporters=agent_metrics)
-            
 
     def initialize_network(self):
         """
@@ -157,6 +160,21 @@ class AdaptationModel(Model):
         adapted_count = sum([1 for agent in self.schedule.agents if isinstance(agent, Households) and agent.is_adapted])
         return adapted_count
     
+    def total_dryproofed_households(self):
+        """Return the total number of households that have dry-proofed."""
+        dryproofed_count = sum([1 for agent in self.schedule.agents if isinstance(agent, Households) and agent.is_dryproofed])
+        return dryproofed_count
+    
+    def total_wetproofed_households(self):
+        """Return the total number of households that have wet-proofed."""
+        wetproofed_count = sum([1 for agent in self.schedule.agents if isinstance(agent, Households) and agent.is_wetproofed])
+        return wetproofed_count
+    
+    def total_elevated_households(self):
+        """Return the total number of households that have elevated."""
+        elevated_count = sum([1 for agent in self.schedule.agents if isinstance(agent, Households) and agent.is_elevated])
+        return elevated_count   
+
     def plot_model_domain_with_agents(self):
         fig, ax = plt.subplots()
         # Plot the model domain
