@@ -79,6 +79,11 @@ class Households(Agent):
    
     # Function to calculate income for households
     def generate_income(self, alpha=1, beta=3000):
+        '''
+        This function calculates the income of a household from a gamma distribution. 
+        Parameters: Alpha (1), Beta(3000). These are parameters of a gamma distribution.
+        Return: income(int)
+        '''
         while True:
             income = random.gammavariate(alpha, beta)
             if 1000 <= income <= 50000: # min and max cap for income
@@ -86,6 +91,16 @@ class Households(Agent):
             
     # Function to calculate savings update (households save or consume from their savings)
     def calculate_saving(self, saving_threshold= 0.25):
+        '''
+        This function decides whether households save or spend from their consumes in each step
+        based on a random threshold. It updates their savings according to their decisions.
+
+        Parameters:
+            saving_threshold(float): A threshold defined for households to decide whether spending or saving.
+                                     Default value is 0.25.
+        Return: 
+            None
+        '''
         saving_rate = self.saving_rate
         # select consumption rate from the list
         consumption_rate = random.choice([0.05, 0.1, 0.15, 0.2, 0.25])  
