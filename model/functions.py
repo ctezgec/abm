@@ -163,6 +163,7 @@ def calculate_basic_flood_damage(flood_depth):
         flood_damage = 0.1746 * math.log(flood_depth) + 0.6483
     return flood_damage
 
+# EU is the given RBB to Group 3. It is coded in functions to demonstrate its separatability from the rest.
 def calculate_EU(savings, flood_probability, flood_damage, measure_information):
     """
     Calculates Expected Utility (EU) of households' flooding adaptation measures.
@@ -180,7 +181,7 @@ def calculate_EU(savings, flood_probability, flood_damage, measure_information):
     """
 
     # If entire savings are wiped out, no measures can be implemented (to prevent log0 error)
-    if flood_damage == 1:
+    if flood_damage == 1:  # highest damage factor
         best_measure_dict = {'measure':'no_action', 'cost': 0, 'efficiency': 0}
         return best_measure_dict
     
@@ -218,56 +219,5 @@ def calculate_EU(savings, flood_probability, flood_damage, measure_information):
         return best_measure_dict
 
 
-def divide_map_into_areas(flood_map, x=3):
-    """
-    Divide the flood map into x^2 local areas.
 
-    Parameters
-    ----------
-    flood_map: flood map in tif format
-    x: number of areas sqrt to divide the map into
-
-    Returns
-    -------
-    areas: a dictionary with area number as key and region boundaries as values
-    """
-    band, bound_l, bound_r, bound_t, bound_b = get_flood_map_data(flood_map)
-    num_rows = num_cols = int(x)
-
-    # Calculate the width and height of each area
-    width = (bound_r - bound_l) / num_cols
-    height = (bound_t - bound_b) / num_rows
-
-    areas = {}
-    area_number = 1
-
-    for i in range(num_rows):
-        for j in range(num_cols):
-            area_left = bound_l + j * width
-            area_right = area_left + width
-            area_top = bound_t - i * height
-            area_bottom = area_top - height
-
-            areas[area_number] = {
-                'left': area_left,
-                'right': area_right,
-                'top': area_top,
-                'bottom': area_bottom
-            }
-            area_number += 1
-
-    return areas
-
-
-# Example: Select 3 random areas from the divided areas to be flooded
-def select_flooded_areas(flood_map, seed=1, num_flooded_areas = 3):
-    """
-    Selects a subset of areas to be flooded.
-    """
-    divided_areas = divide_map_into_areas(flood_map)
-    # Example: Select 3 random areas from the divided areas to be flooded
-    all_areas = list(divided_areas.keys())  # Assuming divided_areas is the dictionary of areas
-    random.seed(seed)
-    flooded_areas = random.sample(all_areas, num_flooded_areas)
-    return flooded_areas
 

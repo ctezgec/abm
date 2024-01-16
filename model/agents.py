@@ -19,7 +19,7 @@ class Households(Agent):
     def __init__(self, unique_id, model):
         super().__init__(unique_id, model)
         self.is_adapted = False  # Initial adaptation status set to False
-# T0-DO: make probabilities more realistic (these are yearly probabilities)
+        # yearly probabilities
         self.flood_type = self.model.map_choice  # Choice of flood map "harvey", "100yr", or "500yr"
         if self.flood_type == "harvey":
             self.flood_probability = 0.07  # Probability of flooding
