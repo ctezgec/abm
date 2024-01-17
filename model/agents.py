@@ -162,12 +162,14 @@ class Households(Agent):
                 self.dryproofing_lifetime -= 1      # quarterly decrease (total life time 20 years, i.e. 80 quarters)
                 if self.dryproofing_lifetime == 0:
                     self.is_dryproofed = False
-                    self.flood_damage_estimated = self.flood_damage_estimated_old
-                    self.flood_damage_actual = self.flood_damage_estimated_old
+                    self.flood_damage_estimated = self.flood_damage_estimated / (1-self.dryproofing_efficiency)
+                    self.flood_damage_actual = self.flood_damage_actual / (1-self.dryproofing_efficiency)
                     implemented_measures.remove("dryproofing")
                     # if no measure implemented except dryproofing, then the agent is not adapted
                     if len(implemented_measures) == 0:
                         self.is_adapted = False
+                        #self.flood_damage_estimated = self.flood_damage_estimated_old
+                        #self.flood_damage_actual = self.flood_damage_estimated_old
 
         # check which measures are available to implement
         available_measures = [measure for measure in ['elevation', 'dryproofing', 'wetproofing'] if measure not in implemented_measures]
