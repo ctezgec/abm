@@ -8,6 +8,7 @@ import geopandas as gpd
 import rasterio as rs
 import matplotlib.pyplot as plt
 import random
+import numpy as np
 
 # Import the agent class(es) from agents.py
 from agents import Households, Government
@@ -43,10 +44,15 @@ class AdaptationModel(Model):
                  ):
         
         super().__init__(seed = seed)
+        # set the seed to get the same results
+        self.seed = seed
+        random.seed(seed)
+        np.random.seed(seed=seed)
+
         
         # defining the variables and setting the values
         self.number_of_households = number_of_households  # Total number of household agents
-        self.seed = seed
+        #self.seed_value = seed
         self.subsidy_percentage = subsidy_percentage # subsidy percentage given to households, integer between 0 and 100.
         self.income_threshold = income_threshold # income threshold defined for subsidy eligibility
 
@@ -68,8 +74,8 @@ class AdaptationModel(Model):
         # Initialize maps
         self.initialize_maps(flood_map_choice)
 
-        # set schedule for agents, since it is EU model, RandomActivation is not necessary
-        self.schedule = BaseScheduler(self)  # Schedule for activating agents
+        # set schedule for agents
+        self.schedule = RandomActivation(self)  # Schedule for activating agents
 
         # create households through initiating a household on each node of the network graph
         for i, node in enumerate(self.G.nodes(),start=1):

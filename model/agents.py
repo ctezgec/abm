@@ -1,6 +1,7 @@
 # Importing necessary libraries
 import random
 from mesa import Agent
+import numpy as np
 from shapely.geometry import Point
 from shapely import contains_xy
 
@@ -110,7 +111,6 @@ class Households(Agent):
         # select saving rate from the list 
         saving_rate =  random.choice([0.05, 0.1, 0.15, 0.2, 0.25]) 
 
-        #random.seed(self.model.seed)
         if random.random() > saving_threshold:
             # Agent saves
             amount_saved = self.income * saving_rate *3 # quarterly saving
