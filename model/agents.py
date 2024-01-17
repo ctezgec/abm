@@ -138,6 +138,9 @@ class Households(Agent):
             #update the agent parameter (instead of removing and adding)
             self.is_adapted = False
             self.is_dryproofed = False
+            self.dryproofing_lifetime = 0
+            self.flood_damage_actual = calculate_basic_flood_damage(flood_depth=self.flood_depth_actual)
+            self.flood_damage_estimated = calculate_basic_flood_damage(flood_depth=self.flood_depth_estimated)
             self.is_elevated = False
             self.is_wetproofed = False
             self.age = random.randint(20, 79)
@@ -168,8 +171,7 @@ class Households(Agent):
                     # if no measure implemented except dryproofing, then the agent is not adapted
                     if len(implemented_measures) == 0:
                         self.is_adapted = False
-                        #self.flood_damage_estimated = self.flood_damage_estimated_old
-                        #self.flood_damage_actual = self.flood_damage_estimated_old
+
 
         # check which measures are available to implement
         available_measures = [measure for measure in ['elevation', 'dryproofing', 'wetproofing'] if measure not in implemented_measures]
