@@ -138,11 +138,11 @@ class Households(Agent):
             #update the agent parameter (instead of removing and adding)
             self.is_adapted = False
             self.is_dryproofed = False
+            self.is_elevated = False
+            self.is_wetproofed = False
             self.dryproofing_lifetime = 0
             self.flood_damage_actual = calculate_basic_flood_damage(flood_depth=self.flood_depth_actual)
             self.flood_damage_estimated = calculate_basic_flood_damage(flood_depth=self.flood_depth_estimated)
-            self.is_elevated = False
-            self.is_wetproofed = False
             self.age = random.randint(20, 79)
             self.income = self.generate_income()
             self.savings_number = random.randint(1,3)
