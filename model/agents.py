@@ -43,9 +43,9 @@ class Households(Agent):
         # Measure costs and efficiencies
         self.elevation_cost =  random.randint(30000, 40000)  # Cost of elevation
         self.elevation_efficiency = 1  # Efficiency of elevation
-        self.dryproofing_cost = random.randint(5000, 9000)  # Cost of dry-proofing
+        self.dryproofing_cost = random.randint(5000, 10000)  # Cost of dry-proofing
         self.dryproofing_efficiency = 0.5  # Efficiency of dry-proofing
-        self.wetproofing_cost = random.randint(3500, 8000)  # Cost of wet-proofing
+        self.wetproofing_cost = random.randint(3000, 8000)  # Cost of wet-proofing
         self.wetproofing_efficiency = 0.4  # Efficiency of wet-proofing
     
         # getting flood map values
@@ -77,11 +77,16 @@ class Households(Agent):
         self.flood_damage_actual = calculate_basic_flood_damage(flood_depth=self.flood_depth_actual)
    
     # Function to calculate income for households
-    def generate_income(self, alpha=1, beta=3000):
+    def generate_income(self, alpha=2, beta=3000):
         '''
         This function calculates the income of a household from a gamma distribution. 
-        Parameters: Alpha (1), Beta(3000). These are parameters of a gamma distribution.
-        Return: income(int)
+        Parameters: 
+            Alpha: Shape parameter, controlling the skewness. A shape parameter less than 1 
+            results in a left-skewed distribution.
+            Beta: Scale parameter, controlling the spread. Larger values of the scale parameter 
+            result in wider distributions.
+        Return: 
+            income(int)
         '''
         while True:
             income = random.gammavariate(alpha, beta)

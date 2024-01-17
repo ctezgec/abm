@@ -97,6 +97,9 @@ class AdaptationModel(Model):
                         "Income":"income",
                         "Savings":"savings",
                         "Age":"age",
+                        "ElevationCost":"elevation_cost",
+                        "DryproofingCost":"dryproofing_cost",
+                        "WetproofingCost":"wetproofing_cost",
                         "location":"location",
                         }
         

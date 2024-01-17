@@ -226,4 +226,4 @@ def generate_random_number(mean, min_value, max_value, std_deviation):
         random_number (float): Random number"""
     random_number = np.random.normal(mean, std_deviation)
     random_number = max(min_value, min(max_value, random_number))
-    return random_number
+    return int(random_number)
