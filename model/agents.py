@@ -137,11 +137,14 @@ class Households(Agent):
         if self.age >= 80:
             #update the agent parameter (instead of removing and adding)
             self.is_adapted = False
+            self.is_dryproofed = False
+            self.is_elevated = False
+            self.is_wetproofed = False
             self.age = random.randint(20, 79)
             self.income = self.generate_income()
             self.savings_number = random.randint(1,3)
             self.savings = self.savings_number*self.income
-            self.saving_rate = 0.2 #change
+
     
 
         implemented_measures = []
