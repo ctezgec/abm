@@ -24,6 +24,7 @@ class Households(Agent):
         self.reduced_actual_damage = 0  
         self.measures_undergone = [] # measures undergone by the agent (necessary when actual flood happends)
         self.reduced_estimated_damage = 0
+        self.counter = 0 # counter for the number of steps 
 
         # Flooding probabilities 
         self.flood_type = self.model.map_choice  # Choice of flood map "harvey", "100yr", or "500yr"
@@ -142,6 +143,8 @@ class Households(Agent):
 
         self.age += 0.25  # Age increases by 1/4 every step (quarterly)
         self.calculate_saving() # Savings updated
+        self.counter += 1 # counter increases by 1 every step
+        
 
         # When agent becomes 80, it dies and its parameters are updated
         if self.age >= 80:
@@ -232,8 +235,8 @@ class Households(Agent):
                 self.is_adapted = True
 
         # calculate the estimated reduced damage (if no measure implemented reduced damage is zero)
-        self.reduced_estimated_damage += (self.flood_damage_estimated_old - self.flood_damage_estimated)* self.savings
-
+        self.reduced_estimated_damage += max(0,(self.flood_damage_estimated_old - self.flood_damage_estimated)* self.savings)
+        self.exp_quarterly_reduced_damage = self.reduced_estimated_damage/self.counter
 
 # Define the Government agent class
 class Government(Agent):

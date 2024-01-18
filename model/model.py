@@ -49,7 +49,7 @@ class AdaptationModel(Model):
         random.seed(seed)
         np.random.seed(seed=seed)
 
-        
+        self.counter = 0 # counter for the number of steps 
         # defining the variables and setting the values
         self.number_of_households = number_of_households  # Total number of household agents
         #self.seed_value = seed
@@ -89,8 +89,9 @@ class AdaptationModel(Model):
                         "total_dryproofed_households": self.total_dryproofed_households,
                         "total_wetproofed_households": self.total_wetproofed_households,
                         "total_elevated_households": self.total_elevated_households,
-                        "total_reduced_actual_damage": self.total_reduced_actual_damage,
-                        "total_reduced_estimated_damage": self.total_reduced_estimated_damage,
+                        "total_reduced_actual_damage": self.total_reduced_actual_damage, # sum in the reel flood events
+                        "total_actual_damage": self.total_actual_damage, # sum in the reel flood events
+                        "total_expected_reduced_estimated_damage": self.total_expected_reduced_estimated_damage, # per quarter
                         }
         
         agent_metrics = {
@@ -100,7 +101,7 @@ class AdaptationModel(Model):
                         "FloodDamageActual" : "flood_damage_actual",
                         "ActualDamage":"actual_damage", # keep count of the actual damage when the flood occurs
                         "ReducedActualDamage":"reduced_actual_damage", # keep count of the reduced actual damage
-                        "ReducedEstimatedDamage":"reduced_estimated_damage", # keep count of the reduced estimated damage
+                        "ExpectedQuarterlyReducedDamage":"exp_quarterly_reduced_damage", # expected estimated damage reduction per agent per quarter (mean)
                         "IsAdapted": "is_adapted",
                         "IsElevated":"is_elevated",
                         "IsDryproofed":"is_dryproofed",
@@ -194,11 +195,17 @@ class AdaptationModel(Model):
         """Return the total reduced actual damage."""
         reduced_actual_damage = sum([agent.reduced_actual_damage for agent in self.schedule.agents if isinstance(agent, Households)])
         return reduced_actual_damage
+    
+    def total_actual_damage(self):
+        """Return the total actual damage."""
+        actual_damage = sum([agent.actual_damage for agent in self.schedule.agents if isinstance(agent, Households)])
+        return actual_damage
 
-    def total_reduced_estimated_damage(self):
+    def total_expected_reduced_estimated_damage(self):
         """Return the total reduced estimated damage."""
         reduced_estimated_damage = sum([agent.reduced_estimated_damage for agent in self.schedule.agents if isinstance(agent, Households)])
-        return reduced_estimated_damage
+        exp_reduced_estimated_damage = reduced_estimated_damage/self.counter  #divide by the number of quarters passed
+        return exp_reduced_estimated_damage
    
 
     def plot_model_domain_with_agents(self):
@@ -234,6 +241,7 @@ class AdaptationModel(Model):
         assume local flooding instead of global flooding). The actual flood depth can be 
         estimated differently
         """
+        self.counter += 1 # increase the counter by 1
         # actual flooding occurs
         if self.schedule.steps == 5 or self.schedule.steps == 80  or self.schedule.steps == 200:
             for agent in self.schedule.agents:
