@@ -93,6 +93,11 @@ class Households(Agent):
             self.subsidy_rate = self.model.subsidy_rate # subsidy percentage
         else:
             self.subsidy_rate = 0
+        
+        # Recalculate the cost with subsidy
+        self.elevation_cost = self.elevation_cost * (1-self.subsidy_rate)
+        self.dryproofing_cost = self.dryproofing_cost * (1-self.subsidy_rate)
+        self.wetproofing_cost = self.wetproofing_cost * (1-self.subsidy_rate)
     
     # Function to calculate income for households
     def generate_income(self, alpha=2, beta=3000):
@@ -193,11 +198,6 @@ class Households(Agent):
 
         # check which measures are available/left to implement
         available_measures = [measure for measure in ['elevation', 'dryproofing', 'wetproofing'] if measure not in implemented_measures]
-
-        # Recalculate the cost with subsidy
-        self.elevation_cost = self.elevation_cost * (1-self.subsidy_rate)
-        self.dryproofing_cost = self.dryproofing_cost * (1-self.subsidy_rate)
-        self.wetproofing_cost = self.wetproofing_cost * (1-self.subsidy_rate)
         
 
         if len(available_measures) > 0: # there are still available measures to implement
