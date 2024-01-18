@@ -27,7 +27,7 @@ class AdaptationModel(Model):
     def __init__(self, 
                  seed = None,
                  number_of_households = 25, # number of household agents
-                 subsidy_percentage = 0, # subsidy percentage available,
+                 subsidy_rate = 0, # subsidy rate available,
                  income_threshold  = 2000, # monthly income threshold for subsidy eligibility 
                  # Simplified argument for choosing flood map. Can currently be "harvey", "100yr", or "500yr".
                  flood_map_choice='harvey',
@@ -53,7 +53,7 @@ class AdaptationModel(Model):
         # defining the variables and setting the values
         self.number_of_households = number_of_households  # Total number of household agents
         #self.seed_value = seed
-        self.subsidy_percentage = subsidy_percentage # subsidy percentage given to households, integer between 0 and 100.
+        self.subsidy_rate = subsidy_rate # subsidy rate given to households, between 0 and 1 (0% to 100%)
         self.income_threshold = income_threshold # income threshold defined for subsidy eligibility
 
         # Add flood map choice to model attributes, so it can be accessed by agents
