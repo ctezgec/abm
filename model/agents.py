@@ -6,7 +6,7 @@ from shapely.geometry import Point
 from shapely import contains_xy
 
 # Import functions from functions.py
-from functions import calculate_EU, generate_random_location_within_map_domain, get_flood_depth, calculate_basic_flood_damage, floodplain_multipolygon, generate_random_number
+from functions import calculate_EU, generate_random_location_within_map_domain, get_flood_depth, calculate_basic_flood_damage, floodplain_multipolygon
 
 
 # Define the Households agent class
@@ -19,17 +19,22 @@ class Households(Agent):
 
     def __init__(self, unique_id, model):
         super().__init__(unique_id, model)
-        self.is_adapted = False  # Initial adaptation status set to False
-        # yearly probabilities
+        # Data collection
+        self.actual_damage = 0 # damage with adaptation (if any)
+        self.reduced_actual_damage = 0  
+        self.measures_undergone = [] # measures undergone by the agent (necessary when actual flood happends)
+
+        # Flooding probabilities 
         self.flood_type = self.model.map_choice  # Choice of flood map "harvey", "100yr", or "500yr"
         if self.flood_type == "harvey":
-            self.flood_probability = 0.07  # Probability of flooding
+            self.flood_probability = 0.07  
         elif self.flood_type == "100yr":
             self.flood_probability = 0.01
         elif self.flood_type == "500yr":
             self.flood_probability = 0.002
     
-        # Adaptation status for each type of measure
+        # Adaptation status (initially no adaptation has been implemented)
+        self.is_adapted = False  # Initial adaptation status set to False
         self.is_elevated = False  # Initial elevation status set to False
         self.is_dryproofed = False  # Initial dry-proofing status set to False
         self.is_wetproofed = False  # Initial wet-proofing status set to False
@@ -76,6 +81,10 @@ class Households(Agent):
         
         #calculate the actual flood damage given the actual flood depth. Flood damage is a factor between 0 and 1
         self.flood_damage_actual = calculate_basic_flood_damage(flood_depth=self.flood_depth_actual)
+
+        # keep the old estimated and actual damage 
+        self.flood_damage_estimated_old = 0
+        self.flood_damage_actual_old = 0
    
     # Function to calculate income for households
     def generate_income(self, alpha=2, beta=3000):
@@ -95,6 +104,7 @@ class Households(Agent):
                 return int(income)
             
     # Function to calculate savings update (households save or consume from their savings)
+    # Note: What is meant by consumption is not a daily consumption, it is for other purposes (e.g., renovation, health, etc.)
     def calculate_saving(self, saving_threshold= 0.25):
         '''
         This function decides whether households save or spend from their consumes in each step
@@ -128,12 +138,11 @@ class Households(Agent):
         return len(friends)
 
     def step(self):
-        # Logic for adaptation based on estimated flood damage and a random chance.
-        # These conditions are examples and should be refined for real-world applications.
+
         self.age += 0.25  # Age increases by 1/4 every step (quarterly)
-        #self.savings += self.monthly_saved*3  
         self.calculate_saving() # Savings updated
 
+        # When agent becomes 80, it dies and its parameters are updated
         if self.age >= 80:
             #update the agent parameter (instead of removing and adding)
             self.is_adapted = False
@@ -148,8 +157,7 @@ class Households(Agent):
             self.savings_number = random.randint(1,3)
             self.savings = self.savings_number*self.income
 
-    
-
+        # Check whether the agent is adapted
         implemented_measures = []
         if self.is_adapted==True:
             # check which measures implemented 
@@ -165,6 +173,8 @@ class Households(Agent):
                 self.dryproofing_lifetime -= 1      # quarterly decrease (total life time 20 years, i.e. 80 quarters)
                 if self.dryproofing_lifetime == 0:
                     self.is_dryproofed = False
+                    self.measures_undergone.remove('dryproofing')
+                    # Reverse the effect of dryproofing
                     self.flood_damage_estimated = self.flood_damage_estimated / (1-self.dryproofing_efficiency)
                     self.flood_damage_actual = self.flood_damage_actual / (1-self.dryproofing_efficiency)
                     implemented_measures.remove("dryproofing")
@@ -173,7 +183,7 @@ class Households(Agent):
                         self.is_adapted = False
 
 
-        # check which measures are available to implement
+        # check which measures are available/left to implement
         available_measures = [measure for measure in ['elevation', 'dryproofing', 'wetproofing'] if measure not in implemented_measures]
 
 # TO-DO: before checking the eligibility below, UPDATE THE COST OF MEASURES ACCORDING TO SUBSIDY
@@ -202,19 +212,20 @@ class Households(Agent):
             if adaptation_choice != 'no_action':
                 if adaptation_choice == 'elevation':
                     self.is_elevated = True
+                    self.measures_undergone.append('elevation')
                 if adaptation_choice == 'dryproofing':
                     self.is_dryproofed = True
                     self.dryproofing_lifetime = 80
+                    self.measures_undergone.append('dryproofing')
                 if adaptation_choice == 'wetproofing':
                     self.is_wetproofed = True
+                    self.measures_undergone.append('wetproofing')
 
                 # update the savings of the agent
                 self.savings -= adaptation_cost
-                # keep track of the old estimated and actual damage (before measures)
+                # keep track of the old estimated damage (before measures)
                 self.flood_damage_estimated_old = self.flood_damage_estimated 
-                self.flood_damage_actual_old = self.flood_damage_actual
-                # update the estimated and actual damage (after measures)
-                self.flood_damage_actual =  self.flood_damage_actual * (1-adaptation_efficiency)
+                # update the estimated damage (after measures)
                 self.flood_damage_estimated = self.flood_damage_estimated * (1-adaptation_efficiency)
                 # update the adaptation status
                 self.is_adapted = True

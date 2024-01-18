@@ -97,6 +97,8 @@ class AdaptationModel(Model):
                         "FloodDepthActual": "flood_depth_actual",
                         "FloodDamageActual" : "flood_damage_actual",
                         "OldEstimatedDamage":"flood_damage_estimated_old",
+                        "ActualDamage":"actual_damage", # keep count of the actual damage when the flood occurs
+                        "ReducedActualDamage":"reduced_actual_damage", # keep count of the actual damage when there is no adaptation
                         "IsAdapted": "is_adapted",
                         "IsElevated":"is_elevated",
                         "IsDryproofed":"is_dryproofed",
@@ -219,17 +221,37 @@ class AdaptationModel(Model):
         assume local flooding instead of global flooding). The actual flood depth can be 
         estimated differently
         """
-        # TO DO LOCAL FLOODING OR OTHER GLOBAL FLOODINGS
-        if self.schedule.steps == 5:
+        # actual flooding occurs
+        if self.schedule.steps == 5 or self.schedule.steps == 80  or self.schedule.steps == 200:
             for agent in self.schedule.agents:
                 if isinstance(agent, Households):
                     # Calculate the actual flood depth as a random number between 0.5 and 1.2 times the estimated flood depth
                     agent.flood_depth_actual = random.uniform(0.5, 1.2) * agent.flood_depth_estimated
                     # calculate the actual flood damage given the actual flood depth
                     agent.flood_damage_actual = calculate_basic_flood_damage(agent.flood_depth_actual)
-        
-        # Collect data and advance the model by one step
-        self.datacollector.collect(self)
+                    # before adaptation, keep track of the actual damage
+                    agent.flood_damage_actual_old = agent.flood_damage_actual
+                    # check for adaptation, and update the actual damage accordingly
+                    if agent.is_adapted:
+                        for measure in agent.measures_undergone:
+                            if measure == 'elevation':
+                                agent.flood_damage_actual *= (1 - agent.elevation_efficiency)
+                            elif measure == 'dryproofing':
+                                agent.flood_damage_actual *= (1 - agent.dryproofing_efficiency)
+                            elif measure == 'wetproofing':
+                                agent.flood_damage_actual *= (1 - agent.wetproofing_efficiency)
+
+                    # keep count of the actual damage of the agent
+                    agent.actual_damage += agent.flood_damage_actual * agent.savings
+                    # keep count of the reduced damage
+                    agent.reduced_actual_damage += (agent.flood_damage_actual_old-agent.flood_damage_actual)* agent.savings
+                    # decrease the savings of the agent by the actual damage
+                    agent.savings -= agent.flood_damage_actual * agent.savings
+ 
+        # Advance the model by one step
         self.schedule.step()
+        # Collect data 
+        self.datacollector.collect(self)
+        
 
 
