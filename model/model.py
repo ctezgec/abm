@@ -88,17 +88,19 @@ class AdaptationModel(Model):
                         "total_adapted_households": self.total_adapted_households,
                         "total_dryproofed_households": self.total_dryproofed_households,
                         "total_wetproofed_households": self.total_wetproofed_households,
-                        "total_elevated_households": self.total_elevated_households
+                        "total_elevated_households": self.total_elevated_households,
+                        "total_reduced_actual_damage": self.total_reduced_actual_damage,
+                        "total_reduced_estimated_damage": self.total_reduced_estimated_damage,
                         }
         
         agent_metrics = {
-                        "FloodDepthEstimated": "flood_depth_estimated",
+                        #"FloodDepthEstimated": "flood_depth_estimated",
                         "FloodDamageEstimated" : "flood_damage_estimated",
-                        "FloodDepthActual": "flood_depth_actual",
+                        #"FloodDepthActual": "flood_depth_actual",
                         "FloodDamageActual" : "flood_damage_actual",
-                        "OldEstimatedDamage":"flood_damage_estimated_old",
                         "ActualDamage":"actual_damage", # keep count of the actual damage when the flood occurs
-                        "ReducedActualDamage":"reduced_actual_damage", # keep count of the actual damage when there is no adaptation
+                        "ReducedActualDamage":"reduced_actual_damage", # keep count of the reduced actual damage
+                        "ReducedEstimatedDamage":"reduced_estimated_damage", # keep count of the reduced estimated damage
                         "IsAdapted": "is_adapted",
                         "IsElevated":"is_elevated",
                         "IsDryproofed":"is_dryproofed",
@@ -187,6 +189,17 @@ class AdaptationModel(Model):
         """Return the total number of households that have elevated."""
         elevated_count = sum([1 for agent in self.schedule.agents if isinstance(agent, Households) and agent.is_elevated])
         return elevated_count   
+    
+    def total_reduced_actual_damage(self):
+        """Return the total reduced actual damage."""
+        reduced_actual_damage = sum([agent.reduced_actual_damage for agent in self.schedule.agents if isinstance(agent, Households)])
+        return reduced_actual_damage
+
+    def total_reduced_estimated_damage(self):
+        """Return the total reduced estimated damage."""
+        reduced_estimated_damage = sum([agent.reduced_estimated_damage for agent in self.schedule.agents if isinstance(agent, Households)])
+        return reduced_estimated_damage
+   
 
     def plot_model_domain_with_agents(self):
         fig, ax = plt.subplots()
