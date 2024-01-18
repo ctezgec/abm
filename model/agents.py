@@ -143,9 +143,7 @@ class Households(Agent):
 
         self.age += 0.25  # Age increases by 1/4 every step (quarterly)
         self.calculate_saving() # Savings updated
-        self.counter += 1 # counter increases by 1 every step
         
-
         # When agent becomes 80, it dies and its parameters are updated
         if self.age >= 80:
             #update the agent parameter (instead of removing and adding)
@@ -236,7 +234,12 @@ class Households(Agent):
 
         # calculate the estimated reduced damage (if no measure implemented reduced damage is zero)
         self.reduced_estimated_damage += max(0,(self.flood_damage_estimated_old - self.flood_damage_estimated)* self.savings)
-        self.exp_quarterly_reduced_damage = self.reduced_estimated_damage/self.counter
+        if self.is_adapted:
+            self.counter += 1 # counter increases by 1 if the agent is adapted
+        if self.counter > 0:
+            self.exp_quarterly_reduced_damage = self.reduced_estimated_damage/self.counter
+        else:
+            self.exp_quarterly_reduced_damage = 0
 
 # Define the Government agent class
 class Government(Agent):
