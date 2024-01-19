@@ -28,7 +28,8 @@ class AdaptationModel(Model):
                  seed = None,
                  number_of_households = 25, # number of household agents
                  subsidy_rate = 0, # subsidy rate available,
-                 income_threshold  = 2000, # monthly income threshold for subsidy eligibility 
+                 income_threshold  = 2000, # monthly income threshold for subsidy eligibility,
+                 saving_threshold = 0.25, # threshold for agents to save or consume
                  # Simplified argument for choosing flood map. Can currently be "harvey", "100yr", or "500yr".
                  flood_map_choice='harvey',
                  # ### network related parameters ###
@@ -55,7 +56,7 @@ class AdaptationModel(Model):
         #self.seed_value = seed
         self.subsidy_rate = subsidy_rate # subsidy rate given to households, between 0 and 1 (0% to 100%)
         self.income_threshold = income_threshold # income threshold defined for subsidy eligibility
-
+        self.saving_threshold = saving_threshold # use this threshold for agents calculate_saving() function
         # Add flood map choice to model attributes, so it can be accessed by agents
         self.map_choice = flood_map_choice  # Choice of flood map
 
@@ -208,6 +209,7 @@ class AdaptationModel(Model):
         return exp_reduced_estimated_damage
    
 
+
     def plot_model_domain_with_agents(self):
         fig, ax = plt.subplots()
         # Plot the model domain
@@ -242,8 +244,8 @@ class AdaptationModel(Model):
         estimated differently
         """
         self.counter += 1 # increase the counter by 1
-        # actual flooding occurs
-        if self.schedule.steps == 5 or self.schedule.steps == 80  or self.schedule.steps == 200:
+        # actual flooding occurs in 5th, 20th and 50th years. So, 20th, 80th and 200th quarters.
+        if self.schedule.steps == 20 or self.schedule.steps == 80  or self.schedule.steps == 200:
             for agent in self.schedule.agents:
                 if isinstance(agent, Households):
                     # Calculate the actual flood depth as a random number between 0.5 and 1.2 times the estimated flood depth

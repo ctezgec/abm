@@ -47,7 +47,8 @@ class Households(Agent):
         self.income = self.generate_income()  # Monthly income of the household
         self.savings_number= random.randint(1,3) # how many income the household has saved
         self.savings = self.savings_number*self.income  # Total initial savings of the household
-        
+        # Consume or save threshold
+        self.saving_threshold = self.model.saving_threshold # Saving threshold for the household
 
         # Measure costs and efficiencies
         self.elevation_cost =  random.randint(30000, 40000)  # Cost of elevation
@@ -119,7 +120,7 @@ class Households(Agent):
             
     # Function to calculate savings update (households save or consume from their savings)
     # Note: What is meant by consumption is not a daily consumption, it is for other purposes (e.g., renovation, health, etc.)
-    def calculate_saving(self, saving_threshold= 0.25):
+    def calculate_saving(self):
         '''
         This function decides whether households save or spend from their consumes in each step
         based on a random threshold. It updates their savings according to their decisions.
@@ -134,8 +135,8 @@ class Households(Agent):
         consumption_rate = random.choice([0.05, 0.1, 0.15, 0.2, 0.25])  
         # select saving rate from the list 
         saving_rate =  random.choice([0.05, 0.1, 0.15, 0.2, 0.25]) 
-
-        if random.random() > saving_threshold:
+       
+        if random.random() > self.saving_threshold:
             # Agent saves
             amount_saved = self.income * saving_rate *3 # quarterly saving
             self.savings += amount_saved
