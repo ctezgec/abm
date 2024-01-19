@@ -24,7 +24,8 @@ class Households(Agent):
         self.reduced_actual_damage = 0  
         self.measures_undergone = [] # measures undergone by the agent (necessary when actual flood happends)
         self.reduced_estimated_damage = 0
-        self.counter = 0 # counter for the number of steps 
+        self.counter = 0 # counter for the number of steps after adaptation
+
 
         # Flooding probabilities 
         self.flood_type = self.model.map_choice  # Choice of flood map "harvey", "100yr", or "500yr"
@@ -155,21 +156,33 @@ class Households(Agent):
         self.age += 0.25  # Age increases by 1/4 every step (quarterly)
         self.calculate_saving() # Savings updated
         
-        # When agent becomes 80, it dies and its parameters are updated
+        # When agent becomes 80, it dies and its parameters are changed
         if self.age >= 80:
-            #update the agent parameter (instead of removing and adding)
-            self.is_adapted = False
-            self.is_dryproofed = False
-            self.is_elevated = False
-            self.is_wetproofed = False
-            self.dryproofing_lifetime = 0
-            self.flood_damage_actual = calculate_basic_flood_damage(flood_depth=self.flood_depth_actual)
-            self.flood_damage_estimated = calculate_basic_flood_damage(flood_depth=self.flood_depth_estimated)
+            # update the agent parameter (instead of removing and adding) 
+            # we assume that the adaptations taken stay in the house
             self.age = random.randint(20, 79)
             self.income = self.generate_income()
             self.savings_number = random.randint(1,3)
             self.savings = self.savings_number*self.income
 
+            # Recheck subsidy eligibility  based on the new income
+            if self.income <= self.model.income_threshold:
+                self.subsidy_rate = self.model.subsidy_rate # subsidy percentage
+            else:
+                self.subsidy_rate = 0
+
+            # Assign new measure costs
+            self.elevation_cost =  random.randint(30000, 40000)  # Cost of elevation
+            self.dryproofing_cost = random.randint(5000, 10000)  # Cost of dry-proofing
+            self.wetproofing_cost = random.randint(3000, 8000)  # Cost of wet-proofing
+
+            # Recalculate the costs with subsidy
+            # if not eligible subsidy rate is zero, so the cost remains the same
+            self.elevation_cost = self.elevation_cost * (1-self.subsidy_rate)
+            self.dryproofing_cost = self.dryproofing_cost * (1-self.subsidy_rate)
+            self.wetproofing_cost = self.wetproofing_cost * (1-self.subsidy_rate)
+    
+                
         # Check whether the agent is adapted
         implemented_measures = []
         if self.is_adapted==True:
@@ -230,7 +243,7 @@ class Households(Agent):
                 if adaptation_choice == 'wetproofing':
                     self.is_wetproofed = True
                     self.measures_undergone.append('wetproofing')
-
+            
                 # update the savings of the agent
                 self.savings -= adaptation_cost
                 # keep track of the old estimated damage (before measures)
