@@ -30,7 +30,7 @@ class Households(Agent):
         # Flooding probabilities 
         self.flood_type = self.model.map_choice  # Choice of flood map "harvey", "100yr", or "500yr"
         if self.flood_type == "harvey":
-            self.flood_probability = 0.07  
+            self.flood_probability = self.model.harvey_probability  
         elif self.flood_type == "100yr":
             self.flood_probability = 0.01
         elif self.flood_type == "500yr":

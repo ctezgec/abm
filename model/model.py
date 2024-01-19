@@ -27,9 +27,10 @@ class AdaptationModel(Model):
     def __init__(self, 
                  seed = None,
                  number_of_households = 25, # number of household agents
-                 subsidy_rate = 0, # subsidy rate available,
+                 subsidy_rate = 0, # subsidy rate,
                  income_threshold  = 2000, # monthly income threshold for subsidy eligibility,
                  saving_threshold = 0.25, # threshold for agents to save or consume
+                 harvey_probability = 0.07, # probability of harvey flood
                  # Simplified argument for choosing flood map. Can currently be "harvey", "100yr", or "500yr".
                  flood_map_choice='harvey',
                  # ### network related parameters ###
@@ -59,6 +60,8 @@ class AdaptationModel(Model):
         self.saving_threshold = saving_threshold # use this threshold for agents calculate_saving() function
         # Add flood map choice to model attributes, so it can be accessed by agents
         self.map_choice = flood_map_choice  # Choice of flood map
+        # flood probability for harvey
+        self.harvey_probability = harvey_probability
 
 
         # network
