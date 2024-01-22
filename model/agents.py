@@ -49,7 +49,7 @@ class Households(Agent):
         self.savings = self.savings_number*self.income  # Total initial savings of the household
         # Consume or save threshold
         self.saving_threshold = self.model.saving_threshold # Saving threshold for the household
-
+        
         # Measure costs and efficiencies
         self.elevation_cost =  random.randint(30000, 40000)  # Cost of elevation
         self.elevation_efficiency = 1  # Efficiency of elevation
@@ -63,6 +63,8 @@ class Households(Agent):
         loc_x, loc_y = generate_random_location_within_map_domain()
         self.location = Point(loc_x, loc_y)
 
+        print("Agent {} moved in {} with income {} and savings {} and age {}".format(self.unique_id, self.location, self.income, self.savings, self.age))
+            
         # Check whether the location is within floodplain
         self.in_floodplain = False
         if contains_xy(geom=floodplain_multipolygon, x=self.location.x, y=self.location.y):
@@ -92,6 +94,7 @@ class Households(Agent):
 
         # subsidy given if the income is below the threshold
         if self.income <= self.model.income_threshold:
+            print("Agent {} is eligible for subsidy".format(self.unique_id))
             self.subsidy_rate = self.model.subsidy_rate # subsidy percentage
         else:
             self.subsidy_rate = 0
@@ -161,11 +164,13 @@ class Households(Agent):
         if self.age >= 80:
             # update the agent parameter (instead of removing and adding) 
             # we assume that the adaptations taken stay in the house
+            print("Agent {} died".format(self.unique_id))
             self.age = random.randint(20, 79)
             self.income = self.generate_income()
             self.savings_number = random.randint(1,3)
             self.savings = self.savings_number*self.income
-
+            #Print agent id, location, income, age, savings
+            print("Agent {} moved in {} with income {} and savings {} and age {}".format(self.unique_id, self.location, self.income, self.savings, self.age))
             # Recheck subsidy eligibility  based on the new income
             if self.income <= self.model.income_threshold:
                 self.subsidy_rate = self.model.subsidy_rate # subsidy percentage
@@ -199,6 +204,7 @@ class Households(Agent):
             if "dryproofing" in implemented_measures:
                 self.dryproofing_lifetime -= 1      # quarterly decrease (total life time 20 years, i.e. 80 quarters)
                 if self.dryproofing_lifetime == 0:
+                    print("Agent {}'s dryproofing measure expired".format(self.unique_id))
                     self.is_dryproofed = False
                     self.measures_undergone.remove('dryproofing')
                     # Reverse the effect of dryproofing
@@ -244,7 +250,7 @@ class Households(Agent):
                 if adaptation_choice == 'wetproofing':
                     self.is_wetproofed = True
                     self.measures_undergone.append('wetproofing')
-            
+                print("Agent {} implemented {} with cost {} and efficiency {}".format(self.unique_id, adaptation_choice, adaptation_cost, adaptation_efficiency))
                 # update the savings of the agent
                 self.savings -= adaptation_cost
                 # keep track of the old estimated damage (before measures)
