@@ -170,7 +170,7 @@ class Households(Agent):
             self.savings_number = random.randint(1,3)
             self.savings = self.savings_number*self.income
             #Print agent id, location, income, age, savings
-            print("Agent {} moved in {} with income {} and savings {} and age {}".format(self.unique_id, self.location, self.income, self.savings, self.age))
+            print("New Agent {} moved in {} with income {} and savings {} and age {}".format(self.unique_id, self.location, self.income, self.savings, self.age))
             # Recheck subsidy eligibility  based on the new income
             if self.income <= self.model.income_threshold:
                 self.subsidy_rate = self.model.subsidy_rate # subsidy percentage
