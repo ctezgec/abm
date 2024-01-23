@@ -138,7 +138,7 @@ class Households(Agent):
         consumption_rate = random.choice([0.05, 0.1, 0.15, 0.2, 0.25])  
         # select saving rate from the list 
         saving_rate =  random.choice([0.05, 0.1, 0.15, 0.2, 0.25]) 
-       
+        self.saving_old = self.savings # keep the old savings for verification
         if random.random() > self.saving_threshold:
             # Agent saves
             amount_saved = self.income * saving_rate *3 # quarterly saving
@@ -159,7 +159,9 @@ class Households(Agent):
 
         self.age += 0.25  # Age increases by 1/4 every step (quarterly)
         self.calculate_saving() # Savings updated
-        
+        # print the difference between the old and new savings
+        print("Agent {}'s savings changed from {} to {}".format(self.unique_id, self.saving_old, self.savings))
+
         # When agent becomes 80, it dies and its parameters are changed
         if self.age >= 80:
             # update the agent parameter (instead of removing and adding) 
