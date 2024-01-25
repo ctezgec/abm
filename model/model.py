@@ -96,6 +96,7 @@ class AdaptationModel(Model):
                         "total_reduced_actual_damage": self.total_reduced_actual_damage, # sum in the reel flood events
                         "total_actual_damage": self.total_actual_damage, # sum in the reel flood events
                         "total_expected_reduced_estimated_damage": self.total_expected_reduced_estimated_damage, # per quarter
+                        "total_expenditure_on_adaptations": self.total_expenditure_on_adaptations, # sum of all the expenditures on adaptations
                         }
         
         agent_metrics = {
@@ -210,6 +211,11 @@ class AdaptationModel(Model):
         reduced_estimated_damage = sum([agent.reduced_estimated_damage for agent in self.schedule.agents if isinstance(agent, Households)])
         exp_reduced_estimated_damage = reduced_estimated_damage/self.counter  #divide by the number of quarters passed
         return exp_reduced_estimated_damage
+    
+    def total_expenditure_on_adaptations(self):
+        """Return the total expenditure on adaptations."""
+        expenditure_on_adaptations = sum([agent.measure_expenditure for agent in self.schedule.agents if isinstance(agent, Households)])
+        return expenditure_on_adaptations
    
 
 

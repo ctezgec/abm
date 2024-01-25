@@ -25,7 +25,7 @@ class Households(Agent):
         self.measures_undergone = [] # measures undergone by the agent (necessary when actual flood happends)
         self.reduced_estimated_damage = 0
         self.counter = 0 # counter for the number of steps after adaptation
-
+        self.measure_expenditure = 0 # total expenditure for adaptation measures
 
         # Flooding probabilities 
         self.flood_type = self.model.map_choice  # Choice of flood map "harvey", "100yr", or "500yr"
@@ -261,6 +261,8 @@ class Households(Agent):
                 self.flood_damage_estimated = self.flood_damage_estimated * (1-adaptation_efficiency)
                 # update the adaptation status
                 self.is_adapted = True
+                # keep track of the measure expenditure
+                self.measure_expenditure += adaptation_cost
 
         # calculate the estimated reduced damage (if no measure implemented reduced damage is zero)
         self.reduced_estimated_damage += max(0,(self.flood_damage_estimated_old - self.flood_damage_estimated)* self.savings)
