@@ -26,6 +26,7 @@ class Households(Agent):
         self.reduced_estimated_damage = 0
         self.counter = 0 # counter for the number of steps after adaptation
         self.measure_expenditure = 0 # total expenditure for adaptation measures
+        self.total_subsidy = 0 # total subsidy given to the agent
 
         # Flooding probabilities 
         self.flood_type = self.model.map_choice  # Choice of flood map "harvey", "100yr", or "500yr"
@@ -98,11 +99,19 @@ class Households(Agent):
             self.subsidy_rate = self.model.subsidy_rate # subsidy percentage
         else:
             self.subsidy_rate = 0
-        
+        # keep track of the old measure costs
+        self.elevation_cost_old = self.elevation_cost
+        self.dryproofing_cost_old = self.dryproofing_cost
+        self.wetproofing_cost_old = self.wetproofing_cost
         # Recalculate the cost with subsidy
         self.elevation_cost = self.elevation_cost * (1-self.subsidy_rate)
         self.dryproofing_cost = self.dryproofing_cost * (1-self.subsidy_rate)
         self.wetproofing_cost = self.wetproofing_cost * (1-self.subsidy_rate)
+        # keep track of the difference between the old and new costs 
+        # zero if no subsidy is given
+        self.elevation_cost_diff = self.elevation_cost_old - self.elevation_cost
+        self.dryproofing_cost_diff = self.dryproofing_cost_old - self.dryproofing_cost
+        self.wetproofing_cost_diff = self.wetproofing_cost_old - self.wetproofing_cost
     
     # Function to calculate income for households
     def generate_income(self, alpha=2, beta=3000):
@@ -189,6 +198,12 @@ class Households(Agent):
             self.elevation_cost = self.elevation_cost * (1-self.subsidy_rate)
             self.dryproofing_cost = self.dryproofing_cost * (1-self.subsidy_rate)
             self.wetproofing_cost = self.wetproofing_cost * (1-self.subsidy_rate)
+
+            # keep track of the difference between the old and new costs
+            # zero if no subsidy is given
+            self.elevation_cost_diff = self.elevation_cost_old - self.elevation_cost
+            self.dryproofing_cost_diff = self.dryproofing_cost_old - self.dryproofing_cost
+            self.wetproofing_cost_diff = self.wetproofing_cost_old - self.wetproofing_cost
     
                 
         # Check whether the agent is adapted
@@ -245,13 +260,17 @@ class Households(Agent):
                 if adaptation_choice == 'elevation':
                     self.is_elevated = True
                     self.measures_undergone.append('elevation')
+                    # keep track of the total subsidy given to the agent
+                    self.total_subsidy += self.elevation_cost_diff
                 if adaptation_choice == 'dryproofing':
                     self.is_dryproofed = True
                     self.dryproofing_lifetime = 80
                     self.measures_undergone.append('dryproofing')
+                    self.total_subsidy += self.dryproofing_cost_diff
                 if adaptation_choice == 'wetproofing':
                     self.is_wetproofed = True
                     self.measures_undergone.append('wetproofing')
+                    self.total_subsidy += self.wetproofing_cost_diff
                 # print("Agent {} implemented {} with cost {} and efficiency {}".format(self.unique_id, adaptation_choice, adaptation_cost, adaptation_efficiency))
                 # update the savings of the agent
                 self.savings -= adaptation_cost

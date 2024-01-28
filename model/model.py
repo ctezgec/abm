@@ -97,6 +97,7 @@ class AdaptationModel(Model):
                         "total_actual_damage": self.total_actual_damage, # sum in the reel flood events
                         "total_expected_reduced_estimated_damage": self.total_expected_reduced_estimated_damage, # per quarter
                         "total_expenditure_on_adaptations": self.total_expenditure_on_adaptations, # sum of all the expenditures on adaptations
+                        "total_subsidy": self.total_subsidy, # sum of all the subsidies given to households
                         }
         
         agent_metrics = {
@@ -216,6 +217,11 @@ class AdaptationModel(Model):
         """Return the total expenditure on adaptations."""
         expenditure_on_adaptations = sum([agent.measure_expenditure for agent in self.schedule.agents if isinstance(agent, Households)])
         return expenditure_on_adaptations
+    
+    def total_subsidy(self):
+        """Return the total subsidy given to households."""
+        subsidy = sum([agent.total_subsidy for agent in self.schedule.agents if isinstance(agent, Households)])
+        return subsidy
    
 
 
