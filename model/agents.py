@@ -192,6 +192,10 @@ class Households(Agent):
             self.elevation_cost =  random.randint(30000, 40000)  # Cost of elevation
             self.dryproofing_cost = random.randint(5000, 10000)  # Cost of dry-proofing
             self.wetproofing_cost = random.randint(3000, 8000)  # Cost of wet-proofing
+            # keep track of the old measure costs
+            self.elevation_cost_old = self.elevation_cost
+            self.dryproofing_cost_old = self.dryproofing_cost
+            self.wetproofing_cost_old = self.wetproofing_cost
 
             # Recalculate the costs with subsidy
             # if not eligible subsidy rate is zero, so the cost remains the same
