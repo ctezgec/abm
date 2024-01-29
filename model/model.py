@@ -95,7 +95,9 @@ class AdaptationModel(Model):
                         "total_elevated_households": self.total_elevated_households,
                         "total_reduced_actual_damage": self.total_reduced_actual_damage, # sum in the reel flood events
                         "total_actual_damage": self.total_actual_damage, # sum in the reel flood events
-                        "total_expected_reduced_estimated_damage": self.total_expected_reduced_estimated_damage, # per quarter
+                        "total_reduced_estimated_damage": self.total_reduced_estimated_damage, # total reduced estimated damage
+                        "expected_quarterly_reduced_damage": self.expected_quarterly_reduced_damage, # expected estimated damage reduction per quarter (average)
+                        "reduced_damage_quarterly": self.reduced_damage_quarterly, # reduced damage per quarter (not average)"""
                         "total_expenditure_on_adaptations": self.total_expenditure_on_adaptations, # sum of all the expenditures on adaptations
                         "total_subsidy": self.total_subsidy, # sum of all the subsidies given to households
                         }
@@ -207,11 +209,30 @@ class AdaptationModel(Model):
         actual_damage = sum([agent.actual_damage for agent in self.schedule.agents if isinstance(agent, Households)])
         return actual_damage
 
-    def total_expected_reduced_estimated_damage(self):
-        """Return the total reduced estimated damage."""
-        reduced_estimated_damage = sum([agent.reduced_estimated_damage for agent in self.schedule.agents if isinstance(agent, Households)])
-        exp_reduced_estimated_damage = reduced_estimated_damage/self.counter  #divide by the number of quarters passed
-        return exp_reduced_estimated_damage
+    def total_reduced_estimated_damage(self):
+        """
+        Return the total reduced estimated damage.
+        Note: agent.reduced_estimated_damage accumulates over time
+        """
+        total_reduced_estimated_damage = sum([agent.reduced_estimated_damage for agent in self.schedule.agents if isinstance(agent, Households)])
+        return total_reduced_estimated_damage
+    
+    def expected_quarterly_reduced_damage(self):
+        """"
+        Return the expected quarterly reduced damage. 
+        Total reduced estimated damage divided by the model's time step
+        Note: Total reduced estimated damage is the sum of the reduced estimated damage of all the agents over all time 
+        passed. 
+        """
+        total_reduced_estimated_damage = sum([agent.reduced_estimated_damage for agent in self.schedule.agents if isinstance(agent, Households)])
+        expected_quarterly_reduced_damage = total_reduced_estimated_damage / self.counter # self counter is the model's time step
+        return expected_quarterly_reduced_damage
+    
+    def reduced_damage_quarterly(self):
+        """Return the reduced damage per quarter.
+        Note: it is not an average, it is real reduced damage in estimated flood per quarter"""
+        quarter_reduced_damage = sum([agent.quarter_reduced_damage for agent in self.schedule.agents if isinstance(agent, Households)])
+        return quarter_reduced_damage
     
     def total_expenditure_on_adaptations(self):
         """Return the total expenditure on adaptations."""

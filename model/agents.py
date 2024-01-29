@@ -23,10 +23,10 @@ class Households(Agent):
         self.actual_damage = 0 # damage with adaptation (if any)
         self.reduced_actual_damage = 0  
         self.measures_undergone = [] # measures undergone by the agent (necessary when actual flood happends)
-        self.reduced_estimated_damage = 0
-        self.counter = 0 # counter for the number of steps after adaptation
+        self.reduced_estimated_damage = 0 # reduced estimated damage (accumulates over time)
         self.measure_expenditure = 0 # total expenditure for adaptation measures
         self.total_subsidy = 0 # total subsidy given to the agent
+        self.quarter_reduced_damage = 0 # reduced damage in each quarter (no accumulation)
 
         # Flooding probabilities 
         self.flood_type = self.model.map_choice  # Choice of flood map "harvey", "100yr", or "500yr"
@@ -288,13 +288,12 @@ class Households(Agent):
                 self.measure_expenditure += adaptation_cost
 
         # calculate the estimated reduced damage (if no measure implemented reduced damage is zero)
+        # it adds on it in every step (so it is cumulative)
         self.reduced_estimated_damage += max(0,(self.flood_damage_estimated_old - self.flood_damage_estimated)* self.savings)
-        if self.is_adapted:
-            self.counter += 1 # counter increases by 1 if the agent is adapted
-        if self.counter > 0:
-            self.exp_quarterly_reduced_damage = self.reduced_estimated_damage/self.counter
-        else:
-            self.exp_quarterly_reduced_damage = 0
+        
+        # reduced damage only in this step
+        self.quarter_reduced_damage = max(0,(self.flood_damage_estimated_old - self.flood_damage_estimated)* self.savings)
+
 
 # Define the Government agent class
 class Government(Agent):
