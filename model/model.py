@@ -110,18 +110,18 @@ class AdaptationModel(Model):
                         "ActualDamage":"actual_damage", # keep count of the actual damage when the flood occurs
                         "ReducedActualDamage":"reduced_actual_damage", # keep count of the reduced actual damage
                         "ExpectedQuarterlyReducedDamage":"exp_quarterly_reduced_damage", # expected estimated damage reduction per agent per quarter (mean)
-                        "IsAdapted": "is_adapted",
-                        "IsElevated":"is_elevated",
-                        "IsDryproofed":"is_dryproofed",
-                        "DryproofLifetime":"dryproofing_lifetime",
-                        "IsWetproofed":"is_wetproofed",
-                        "Income":"income",
-                        "Savings":"savings",
-                        "Age":"age",
-                        "ElevationCost":"elevation_cost",
-                        "DryproofingCost":"dryproofing_cost",
-                        "WetproofingCost":"wetproofing_cost",
-                        "location":"location",
+                        # "IsAdapted": "is_adapted",
+                        # "IsElevated":"is_elevated",
+                        # "IsDryproofed":"is_dryproofed",
+                        # "DryproofLifetime":"dryproofing_lifetime",
+                        # "IsWetproofed":"is_wetproofed",
+                        # "Income":"income",
+                        # "Savings":"savings",
+                        # "Age":"age",
+                        # "ElevationCost":"elevation_cost",
+                        # "DryproofingCost":"dryproofing_cost",
+                        # "WetproofingCost":"wetproofing_cost",
+                        # "location":"location",
                         }
         
         #set up the data collector 
