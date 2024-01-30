@@ -27,6 +27,7 @@ class Households(Agent):
         self.measure_expenditure = 0 # total expenditure for adaptation measures
         self.total_subsidy = 0 # total subsidy given to the agent
         self.quarter_reduced_damage = 0 # reduced damage in each quarter (no accumulation)
+        self.quarter_damage = 0 # damage in each quarter (no accumulation)
 
         # Flooding probabilities 
         self.flood_type = self.model.map_choice  # Choice of flood map "harvey", "100yr", or "500yr"
@@ -293,7 +294,8 @@ class Households(Agent):
         
         # reduced damage only in this step
         self.quarter_reduced_damage = max(0,(self.flood_damage_estimated_old - self.flood_damage_estimated)* self.savings)
-
+        # damage only in this step
+        self.quarter_damage = self.flood_damage_estimated * self.savings
 
 # Define the Government agent class
 class Government(Agent):

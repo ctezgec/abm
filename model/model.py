@@ -100,6 +100,7 @@ class AdaptationModel(Model):
                         "reduced_damage_quarterly": self.reduced_damage_quarterly, # reduced damage per quarter (not average)"""
                         "total_expenditure_on_adaptations": self.total_expenditure_on_adaptations, # sum of all the expenditures on adaptations
                         "total_subsidy": self.total_subsidy, # sum of all the subsidies given to households
+                        "total_quarterly_damage": self.total_quarterly_damage, # total quarterly damage (absolute)
                         }
         
         agent_metrics = {
@@ -243,8 +244,12 @@ class AdaptationModel(Model):
         """Return the total subsidy given to households."""
         subsidy = sum([agent.total_subsidy for agent in self.schedule.agents if isinstance(agent, Households)])
         return subsidy
-   
-
+    
+    def total_quarterly_damage(self):
+        """Return the total quarterly damage."""
+        total_quarterly_damage = sum([agent.quarter_damage for agent in self.schedule.agents if isinstance(agent, Households)])
+        return total_quarterly_damage
+       
 
     def plot_model_domain_with_agents(self):
         fig, ax = plt.subplots()
