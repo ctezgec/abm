@@ -27,4 +27,6 @@ The `model` directory contains the actual Python code for the model. It has the 
 - `model_run_experiment`, `model_run_sensitivity`, `model_run_extremevalue.ipynb`: Jupyter notebooks for running the model. 
 - `analysis_experiment`,  `analysis_sensitivity`,  `analysis_extremevalue.ipynb`: Jupyter notebooks for analyzing and plotting the results.
 
+### Important note
+After running the model (`model_run_experiment`, `model_run_sensitivity`, `model_run_extremevalue.ipynb`), the results saved as a csv file. Then, they are uploaded in analysis files. Due to the size of the data files, CSV files have not been uploaded into Git Hub. 
 
