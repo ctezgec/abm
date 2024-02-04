@@ -1,25 +1,30 @@
-## Flood Adaptation - minimal mesa model
+## Flood Adaptation Model
+Created by: SEN1211 Group 03
 
+|        Name        | Student Number |
+|:------------------:|:--------|
+|    Canan Tezgeç    | 5721482 |
+|     Yongxue Tian   | 5767695 |
+|   Anne Stehouwer   | 4455142 |
+
+ 
 ### Introduction
-This directory contains a minimal agent-based model (ABM) implemented in Python, focused on simulating household adaptation to flood events in a social network context. It uses the Mesa framework for ABM and incorporates geographical data processing for flood depth and damage calculations.
+This directory contains an agent-based model (ABM) implemented in Python, focused on simulating household adaptation to flood events utilizing Expected Utility Theory. It uses the Mesa framework for ABM and incorporates geographical data processing for flood depth and damage calculations.
 
 ### Installation
 To set up the project environment, follow these steps:
-1. Make sure you have installed a recent Python version, like 3.11 or 3.12.
-2. Install the latest Mesa version (2.1.5 or above) with `pip install -U mesa`
-2. Clone the repository to your local machine.
-3. Install required dependencies:
-   ```bash
-   pip install -U geopandas shapely rasterio networkx
-   ```
+1. Open the folder in your favorite IDE, e.g. VS Code, PyCharm
+2. Configure Python interpreter (3.11 recommended)
+3. Setup a virtual environment, venv, activate it in the terminal
+4. Run ```pip install -r requirements.txt``` to install the required packages
 
 ### File descriptions
-The `model` directory contains the actual Python code for the minimal model. It has the following files:
-- `agents.py`: Defines the `Households` agent class, each representing a household in the model. These agents have attributes related to flood depth and damage, and their behavior is influenced by these factors. This script is crucial for modeling the impact of flooding on individual households.
-- `functions.py`: Contains utility functions for the model, including setting initial values, calculating flood damage, and processing geographical data. These functions are essential for data handling and mathematical calculations within the model.
-- `model.py`: The central script that sets up and runs the simulation. It integrates the agents, geographical data, and network structures to simulate the complex interactions and adaptations of households to flooding scenarios.
-- `demo.ipynb`: A Jupyter notebook titled "Flood Adaptation: Minimal Model". It demonstrates running a model and analyzing and plotting some results.
-There is also a directory `input_data` that contains the geographical data used in the model. You don't have to touch it, but it's used in the code and there if you want to take a look.
+The `model` directory contains the actual Python code for the model. It has the following files:
+- `agents.py`: Defines the `Households` agent class, each representing a household in the model. These agents have attributes related to flood depth and damage, and these factors influence their behavior. Agents calculate the expected utility of each available measure and decide whether to take action. This script is crucial for modeling the impact of flooding on individual households.
+- `functions.py`: Contains utility functions for the model, including setting initial values, calculating flood damage, and processing geographical data. These functions are essential for data handling and mathematical calculations within the model. It also includes the expected utility function, which is utilized to represent households' adaptation behaviors.
+- `model.py`: The central script that sets up and runs the simulation. It integrates the agents and geographical data to simulate the complex interactions and adaptations of households to flooding scenarios.
+- verification.ipynb: Jupyter notebook that is used for verification. Verification is also conducted in analysis_extreme_value.ipynb by doing extreme value tests.
+- model_run_experiment, model_run_sensitivity, model_run_extremevalue.ipynb: Jupyter notebooks for running the model. 
+- analysis_experiment,  analysis_sensitivity,  analysis_extremevalue.ipynb: Jupyter notebooks for analyzing and plotting the results.
 
-### Usage
-Threat this as a starting point, and feel free to modify, add or remove any components and files you find useful.
+
